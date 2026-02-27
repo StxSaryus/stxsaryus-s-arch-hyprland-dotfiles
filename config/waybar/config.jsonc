@@ -1,23 +1,26 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 40,
-    "margin": "6 10 0 10",
-    "spacing": 2,
+    "height": 36,
+    "margin": "6 12 0 12",
+    "spacing": 0,
+    "start_hidden": true,
+    "on-sigusr1": "show",
+    "on-sigusr2": "hide",
 
     "modules-left": [
+        "custom/lock",
         "custom/arch",
         "hyprland/workspaces",
         "hyprland/window",
-        "group/mpris"
+        "mpris"
     ],
     "modules-center": [],
     "modules-right": [
-        "group/stats",
+        "custom/sys_combined",
         "pulseaudio",
         "backlight",
         "battery",
-        "custom/waypaper",
         "network",
         "bluetooth",
         "custom/updates",
@@ -25,7 +28,12 @@
         "custom/power"
     ],
 
-    // ─── Sol ───────────────────────────────────────────────
+    "custom/lock": {
+        "exec": "~/.config/waybar/scripts/lock-icon.sh",
+        "interval": 1,
+        "on-click": "~/.config/waybar/scripts/lock-toggle.sh",
+        "tooltip": false
+    },
 
     "custom/arch": {
         "format": "",
@@ -42,13 +50,8 @@
 
     "hyprland/window": {
         "format": "{}",
-        "max-length": 40,
+        "max-length": 35,
         "separate-outputs": true
-    },
-
-    "group/mpris": {
-        "orientation": "horizontal",
-        "modules": ["mpris"]
     },
 
     "mpris": {
@@ -63,24 +66,11 @@
         "status-icons": {
             "paused": ""
         },
-        "max-length": 45,
+        "max-length": 40,
         "on-click": "playerctl play-pause",
         "on-click-right": "playerctl next",
         "on-scroll-up": "playerctl next",
         "on-scroll-down": "playerctl previous"
-    },
-
-    // ─── Sağ ───────────────────────────────────────────────
-
-    "group/stats": {
-        "orientation": "horizontal",
-        "modules": ["custom/sys_combined"]
-    },
-
-    "custom/gpu": {
-        "exec": "~/.config/waybar/gpu_stats.sh",
-        "interval": 3,
-        "tooltip": false
     },
 
     "custom/sys_combined": {
@@ -148,20 +138,13 @@
     },
 
     "clock": {
-        "format": "󰥔 {:%H:%M}",
-        "format-alt": "󰃭 {:%d %b %Y}",
+        "format": " {:%H:%M}",
+        "format-alt": " {:%d %b %Y}",
         "tooltip-format": "<tt>{calendar}</tt>",
         "calendar": {
             "mode": "month",
             "on-click-right": "mode"
         }
-    },
-
-    "custom/waypaper": {
-        "format": "󰸉",
-        "tooltip": false,
-        "on-click": "waypaper",
-        "on-click-right": "killall waypaper"
     },
 
     "custom/updates": {
