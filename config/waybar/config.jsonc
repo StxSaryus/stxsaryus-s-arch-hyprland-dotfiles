@@ -1,0 +1,182 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 40,
+    "margin": "6 10 0 10",
+    "spacing": 2,
+
+    "modules-left": [
+        "custom/arch",
+        "hyprland/workspaces",
+        "hyprland/window",
+        "group/mpris"
+    ],
+    "modules-center": [],
+    "modules-right": [
+        "group/stats",
+        "pulseaudio",
+        "backlight",
+        "battery",
+        "custom/waypaper",
+        "network",
+        "bluetooth",
+        "custom/updates",
+        "clock",
+        "custom/power"
+    ],
+
+    // ─── Sol ───────────────────────────────────────────────
+
+    "custom/arch": {
+        "format": "",
+        "tooltip": false,
+        "on-click": "wofi --show drun",
+        "on-click-right": "waypaper"
+    },
+
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "on-click": "activate",
+        "sort-by-number": true
+    },
+
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 40,
+        "separate-outputs": true
+    },
+
+    "group/mpris": {
+        "orientation": "horizontal",
+        "modules": ["mpris"]
+    },
+
+    "mpris": {
+        "format": "{player_icon} {title}",
+        "format-paused": " {title}",
+        "player-icons": {
+            "default": "▶",
+            "spotify": "",
+            "firefox": "󰈹",
+            "chromium": ""
+        },
+        "status-icons": {
+            "paused": ""
+        },
+        "max-length": 45,
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous"
+    },
+
+    // ─── Sağ ───────────────────────────────────────────────
+
+    "group/stats": {
+        "orientation": "horizontal",
+        "modules": ["custom/sys_combined"]
+    },
+
+    "custom/gpu": {
+        "exec": "~/.config/waybar/gpu_stats.sh",
+        "interval": 3,
+        "tooltip": false
+    },
+
+    "custom/sys_combined": {
+        "exec": "~/.config/waybar/sys_stats.sh",
+        "interval": 2,
+        "on-click": "~/.config/waybar/sys_stats.sh toggle",
+        "on-click-right": "kitty --class custom_btop -e btop",
+        "signal": 8,
+        "tooltip": false
+    },
+
+    "bluetooth": {
+        "format": "Not active",
+        "format-on": "Not connected",
+        "format-connected": "{device_alias}",
+        "format-connected-battery": "{device_alias} {device_battery_percentage}%",
+        "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "on-click": "blueman-manager"
+    },
+
+    "network": {
+        "format-wifi": "{essid}",
+        "format-ethernet": "󰈀 {ifname}",
+        "format-linked": "󰈀 {ifname}",
+        "format-disconnected": "Not connected",
+        "tooltip-format": "{ifname} • {ipaddr}\nSinyal: {signalStrength}%\nGW: {gwaddr}",
+        "on-click-right": "nm-connection-editor"
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "pavucontrol",
+        "on-scroll-up": "pamixer -i 2",
+        "on-scroll-down": "pamixer -d 2",
+        "tooltip": false
+    },
+
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "󰃞 {percent}%",
+        "tooltip-format": "Parlaklık: {percent}%",
+        "on-scroll-up": "brightnessctl set +5%",
+        "on-scroll-down": "brightnessctl set 5%-"
+    },
+
+    "battery": {
+        "states": {
+            "good": 80,
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰚥 {capacity}%",
+        "format-not-charging": "󰚥 {capacity}%",
+        "format-full": "󰁹 Full",
+        "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "tooltip-format": "{timeTo} • {power:.1f}W"
+    },
+
+    "clock": {
+        "format": "󰥔 {:%H:%M}",
+        "format-alt": "󰃭 {:%d %b %Y}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "on-click-right": "mode"
+        }
+    },
+
+    "custom/waypaper": {
+        "format": "󰸉",
+        "tooltip": false,
+        "on-click": "waypaper",
+        "on-click-right": "killall waypaper"
+    },
+
+    "custom/updates": {
+        "exec": "~/.local/share/bin/systemupdate.sh",
+        "return-type": "json",
+        "format": "{}",
+        "on-click": "hyprctl dispatch exec '~/.local/share/bin/systemupdate.sh up'",
+        "interval": 86400,
+        "tooltip": true,
+        "signal": 20
+    },
+
+    "custom/power": {
+        "format": "󰐥",
+        "tooltip": false,
+        "on-click": "sh -lc 'nwg-bar -f -p center -s style.css -t bar.json'"
+    }
+}
