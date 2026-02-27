@@ -1,0 +1,210 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(15, 15, 20, 0.75);
+    color: #ffffff;
+    border-radius: 14px;
+    transition: all 0.4s ease;
+}
+
+/* ── Modül bölümleri (tek parça, arka plan yok) ───── */
+.modules-left,
+.modules-center,
+.modules-right {
+    background: transparent;
+    padding: 0 4px;
+    margin: 0;
+}
+
+/* ── Her modül ────────────────────────────────────── */
+#workspaces button,
+#clock,
+#battery,
+#network,
+#pulseaudio,
+#bluetooth,
+#mpris,
+#custom-arch,
+#custom-sys_combined,
+#custom-gpu,
+#custom-power,
+#custom-waypaper,
+#custom-updates,
+#window {
+    padding: 0 8px;
+    color: rgba(255, 255, 255, 0.85);
+    background: transparent;
+    transition: all 0.2s ease;
+}
+
+/* ── Hover efekti ────────────────────────────────── */
+#clock:hover,
+#battery:hover,
+#network:hover,
+#pulseaudio:hover,
+#bluetooth:hover,
+#custom-arch:hover,
+#custom-sys_combined:hover,
+#custom-gpu:hover,
+#custom-power:hover,
+#custom-waypaper:hover,
+#custom-updates:hover,
+#mpris:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+/* ── Arch logo ───────────────────────────────────── */
+#custom-arch {
+    font-size: 16px;
+    color: #ffffff;
+    padding: 0 12px 0 8px;
+}
+
+/* ── Workspaces ──────────────────────────────────── */
+#workspaces {
+    padding: 0 2px;
+}
+
+#workspaces button {
+    padding: 0 7px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 13px;
+}
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+#workspaces button.active {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#workspaces button.urgent {
+    color: #ff6b6b;
+}
+
+/* ── Window title ────────────────────────────────── */
+#window {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 12px;
+    padding: 0 6px;
+}
+
+/* ── Media player (sol, hafif vurgulu) ────────────── */
+#group-mpris {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    padding: 0 8px;
+    margin: 5px 2px 5px 4px;
+}
+
+#group-mpris:hover {
+    background: rgba(255, 255, 255, 0.13);
+}
+
+#mpris {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 12px;
+    padding: 0 4px;
+}
+
+#mpris.paused {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Saat ────────────────────────────────────────── */
+#clock {
+    font-weight: 600;
+    color: #ffffff;
+    padding: 0 10px;
+}
+
+/* ── Batarya ─────────────────────────────────────── */
+#battery.good {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+#battery.warning {
+    color: #ffd93d;
+}
+
+#battery.critical {
+    color: #ff6b6b;
+    animation: blink 1s linear infinite alternate;
+}
+
+#battery.charging {
+    color: #6bcb77;
+}
+
+@keyframes blink {
+    from { opacity: 1; }
+    to   { opacity: 0.4; }
+}
+
+/* ── Ağ ──────────────────────────────────────────── */
+#network.disconnected {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Bluetooth ───────────────────────────────────── */
+#bluetooth.connected {
+    color: #74b9ff;
+}
+
+#bluetooth.off {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Ses ─────────────────────────────────────────── */
+#pulseaudio.muted {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Stats grubu ─────────────────────────────────── */
+#group-stats {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    padding: 0 6px;
+    margin: 5px 2px;
+}
+
+#group-stats:hover {
+    background: rgba(255, 255, 255, 0.13);
+}
+
+/* ── GPU ─────────────────────────────────────────── */
+#custom-gpu {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Waypaper ────────────────────────────────────── */
+#custom-waypaper {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0 8px;
+}
+
+/* ── Power butonu ────────────────────────────────── */
+#custom-power {
+    font-size: 15px;
+    padding: 0 8px 0 10px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#custom-power:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
+    border-radius: 8px;
+}

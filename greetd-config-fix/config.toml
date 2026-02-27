@@ -1,0 +1,9 @@
+# greetd + tuigreet + Hyprland (start-hyprland ile, uyarı giderilir)
+# Kopyalamak için: sudo cp config.toml /etc/greetd/config.toml
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --time --remember --asterisks --cmd '/usr/bin/start-hyprland'"
+user = "greeter"
