@@ -25,28 +25,27 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 - **Instant wallpaper** — hyprpaper loads your wallpaper at boot with zero delay
 - **One-click installer** — `install.sh` handles packages, symlinks, and permissions
 - **10 workspaces** — full keyboard + mouse scroll navigation
-- **Dark glass aesthetic** — translucent bar, rounded corners, minimal icons
+- **Dark glass aesthetic** — translucent bar, rounded corners, minimal design
 
 ---
 
-## System
+## Software Used
 
-| Component | Detail |
-|-----------|--------|
-| **OS** | Arch Linux (rolling) |
-| **WM** | Hyprland (Wayland) |
-| **GPU** | NVIDIA GeForce GTX 1050 Ti Mobile |
-| **CPU** | Intel Core i7-7700HQ @ 2.80GHz |
-| **RAM** | 16 GB |
-| **Bar** | Waybar |
+| Role | Software |
+|------|----------|
+| **Window Manager** | Hyprland (Wayland) |
+| **Status Bar** | Waybar (auto-hide, Win11 style) |
 | **Terminal** | Kitty |
 | **Shell** | Zsh + Oh-My-Zsh + Powerlevel10k |
-| **Launcher** | Rofi |
-| **Notifications** | SwayNC |
-| **Wallpaper** | Waypaper + Hyprpaper |
-| **Lock Screen** | Hyprlock |
+| **App Launcher** | Rofi |
+| **Notification Center** | SwayNC |
+| **Wallpaper Manager** | Waypaper + Hyprpaper |
+| **Screen Lock** | Hyprlock |
 | **Power Menu** | nwg-bar |
-| **Audio** | PipeWire |
+| **File Manager** | Thunar |
+| **Browser** | Firefox |
+| **Audio Server** | PipeWire |
+| **Bluetooth Manager** | Blueman |
 
 ---
 
@@ -67,7 +66,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │   │   ├── sys_stats.sh             # CPU / RAM / Temp widget
 │   │   ├── gpu_stats.sh             # NVIDIA GPU widget
 │   │   └── scripts/
-│   │       ├── lock-icon.sh          # Pin state indicator (🔒/🔓)
+│   │       ├── lock-icon.sh          # Pin state indicator
 │   │       └── lock-toggle.sh        # Toggle pin / auto-hide
 │   ├── rofi/
 │   │   └── config.rasi               # Launcher theme (dark glass)
@@ -101,23 +100,23 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + T` | Terminal (Kitty) |
-| `Super + B` | Browser (Firefox) |
-| `Super + E` | File Manager (Dolphin) |
-| `Super + Space` | App Launcher (Rofi) |
-| `Super + L` | Lock Screen (Hyprlock) |
+| `Super + T` | Open terminal (Kitty) |
+| `Super + B` | Open browser (Firefox) |
+| `Super + E` | Open file manager (Thunar) |
+| `Super + Space` | Open app launcher (Rofi) |
+| `Super + L` | Lock screen (Hyprlock) |
 
 ### Window Management
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + C` | Close window |
+| `Super + C` | Close window (graceful) |
 | `Super + Shift + C` | Force kill window (kill -9) |
-| `Super + V` | Toggle floating |
+| `Super + V` | Toggle floating mode |
 | `Shift + F11` | Toggle fullscreen |
-| `Super + Arrow Keys` | Move focus |
-| `Super + Left Click` | Drag to move window |
-| `Super + Right Click` | Drag to resize window |
+| `Super + Arrow Keys` | Move focus between windows |
+| `Super + Left Click` (drag) | Move window |
+| `Super + Right Click` (drag) | Resize window |
 
 ### Workspaces
 
@@ -126,19 +125,19 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 | `Super + 1-9, 0` | Switch to workspace 1-10 |
 | `Super + Alt + 1-9, 0` | Send window to workspace (silent) |
 | `Super + Shift + 1-9, 0` | Move with window to workspace |
-| `Super + Scroll` | Next / previous workspace |
-| `Super + Shift + Scroll` | Move with window to next / prev |
+| `Super + Mouse Scroll` | Next / previous workspace |
+| `Super + Shift + Mouse Scroll` | Move with window to next / prev workspace |
 
-### Media & Hardware
+### Media & Hardware Keys
 
 | Shortcut | Action |
 |----------|--------|
-| `Fn + Brightness Up/Down` | Adjust brightness (with OSD) |
-| `Fn + Volume Up/Down` | Adjust volume (±5%) |
+| `Fn + Brightness Up/Down` | Adjust screen brightness (with OSD notification) |
+| `Fn + Volume Up/Down` | Adjust volume by 5% |
 | `Fn + Mute` | Toggle speaker mute |
 | `Fn + Mic Mute` | Toggle microphone mute |
-| `Media Play` | Play / Pause |
-| `Media Next / Prev` | Next / Previous track |
+| `Media Play/Pause` | Play or pause current media |
+| `Media Next / Previous` | Skip to next or previous track |
 
 ---
 
@@ -146,30 +145,30 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 
 The bar auto-hides like Windows 11 — move your mouse to the top edge to reveal it.
 
-**Left side:**
+### Left Side
 
-| Module | Icon | Click | Right-click |
-|--------|------|-------|-------------|
-| Lock | 🔒 / 🔓 | Toggle pin/auto-hide | — |
-| Arch |  | Rofi launcher | Waypaper |
-| Workspaces | 1-10 | Switch workspace | — |
-| Window title | — | — | — |
-| Media | ▶ / ⏸ | Play/Pause | Next track |
+| Module | What it shows | Click action | Right-click action |
+|--------|--------------|--------------|-------------------|
+| **Pin Toggle** | Locked / Unlocked icon | Toggle between pinned bar and auto-hide | — |
+| **Arch Logo** | Arch Linux icon | Open Rofi app launcher | Open Waypaper wallpaper picker |
+| **Workspaces** | Workspace numbers 1-10 | Switch to that workspace | — |
+| **Window Title** | Active window name | — | — |
+| **Media Player** | Now playing track name | Play / Pause | Next track |
 
-**Right side:**
+### Right Side
 
-| Module | Icon | Click | Right-click | Scroll |
-|--------|------|-------|-------------|--------|
-| System | CPU/RAM/Temp | Toggle detail | Open btop | — |
-| Volume | 󰕾 | Pavucontrol | — | ±2% |
-| Brightness | 󰃞 | — | — | ±5% |
-| Battery | 🔋 | — | — | — |
-| Wallpaper | 󰸉 | Open Waypaper | Kill Waypaper | — |
-| Network | WiFi SSID | — | nm-connection-editor | — |
-| Bluetooth | Device | Blueman | — | — |
-| Updates | 󰮯 | Run update | — | — |
-| Clock |  | Toggle date/time | — | — |
-| Power | 󰐥 | Power menu (nwg-bar) | — | — |
+| Module | What it shows | Click action | Right-click action | Scroll action |
+|--------|--------------|--------------|-------------------|---------------|
+| **System Stats** | CPU / RAM / Temperature | Toggle between compact and detailed view | Open btop system monitor | — |
+| **Volume** | Speaker volume percentage | Open Pavucontrol mixer | — | Adjust volume by 2% |
+| **Brightness** | Screen brightness percentage | — | — | Adjust brightness by 5% |
+| **Battery** | Battery percentage and state | — | — | — |
+| **Wallpaper** | Wallpaper picker icon | Open Waypaper | Close Waypaper | — |
+| **Network** | WiFi network name or Ethernet | — | Open network settings | — |
+| **Bluetooth** | Connected device name | Open Blueman manager | — | — |
+| **Updates** | Available update count | Run system update in terminal | — | — |
+| **Clock** | Current time | Toggle between time and date | — | — |
+| **Power** | Power icon | Open power menu (shutdown, reboot, etc.) | — | — |
 
 ---
 
@@ -212,11 +211,11 @@ sudo pacman -S bluez bluez-utils blueman
 # Terminal & Shell
 sudo pacman -S kitty zsh zsh-completions
 
-# Portals
+# Portals (needed for file dialogs and theme detection)
 sudo pacman -S xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
 
 # Tools
-sudo pacman -S grim slurp swappy cliphist jq imagemagick btop fastfetch
+sudo pacman -S grim slurp swappy cliphist jq imagemagick btop fastfetch thunar
 
 # Fonts
 sudo pacman -S ttf-jetbrains-mono otf-font-awesome ttf-fira-code
@@ -245,9 +244,9 @@ ln -sf "$REPO/config/waybar/scripts/lock-icon.sh" ~/.config/waybar/scripts/lock-
 ln -sf "$REPO/config/waybar/scripts/lock-toggle.sh" ~/.config/waybar/scripts/lock-toggle.sh
 
 # Rofi, Kitty, SwayNC, Waypaper
+mkdir -p ~/.config/rofi ~/.config/kitty ~/.config/swaync ~/.config/waypaper
 ln -sf "$REPO/config/rofi/config.rasi" ~/.config/rofi/config.rasi
 ln -sf "$REPO/config/kitty/kitty.conf" ~/.config/kitty/kitty.conf
-mkdir -p ~/.config/swaync
 ln -sf "$REPO/config/swaync/config.json" ~/.config/swaync/config.json
 ln -sf "$REPO/config/swaync/style.css" ~/.config/swaync/style.css
 ln -sf "$REPO/config/waypaper/config.ini" ~/.config/waypaper/config.ini
@@ -280,7 +279,7 @@ sudo systemctl enable greetd
 
 ## NVIDIA Configuration
 
-This setup is tuned for **NVIDIA GTX 1050 Ti** with proprietary drivers. The following environment variables are set in `hyprland.conf`:
+This setup includes NVIDIA-specific environment variables in `hyprland.conf` for proprietary driver compatibility:
 
 ```ini
 env = LIBVA_DRIVER_NAME,nvidia
@@ -292,28 +291,28 @@ env = ELECTRON_OZONE_PLATFORM_HINT,auto
 env = MOZ_ENABLE_WAYLAND,1
 ```
 
-Additional NVIDIA tweaks:
+Additional tweaks:
 - Hardware cursors disabled (`no_hardware_cursors = true`)
-- Blur and shadows disabled for smooth performance on mobile GPUs
+- Blur and shadows disabled for better performance on mobile GPUs
 - Qt forced to Wayland with XCB fallback
 
-> **Note:** If you use a different GPU, remove or adjust the NVIDIA env vars in `hyprland.conf`.
+> **Note:** If you use an AMD or Intel GPU, remove or comment out the NVIDIA env vars in `hyprland.conf`.
 
 ---
 
 ## Customization
 
 ### Change wallpaper
-Click the 󰸉 icon in waybar (or right-click the Arch icon). The new wallpaper is automatically saved to `hyprpaper.conf` so it loads instantly on next boot.
-
-### Change wallpaper path
-Edit `config/hypr/hyprpaper.conf` — set `preload` and `wallpaper` to your image path.
+Click the wallpaper icon in the waybar (or right-click the Arch logo). Your new wallpaper is automatically saved to `hyprpaper.conf` so it loads instantly on next boot.
 
 ### Adjust auto-hide behavior
-Edit `config/hypr/waybar-autohide.sh` — tweak the sleep timers and mouse position thresholds.
+Edit `config/hypr/waybar-autohide.sh` to tweak sleep timers and mouse position thresholds.
 
 ### Pin the bar permanently
-Click the 🔒 icon on the far left of the bar. When locked (🔒), the bar stays visible. When unlocked (🔓), it auto-hides.
+Click the lock icon on the far left of the bar. When locked, the bar stays visible at all times. When unlocked, it auto-hides when your mouse leaves.
+
+### Change default apps
+Edit `config/hypr/hyprland.conf` — find the keybind section and change the `exec` commands to your preferred apps.
 
 ---
 
@@ -327,6 +326,6 @@ Feel free to fork, modify, and share.
 
 <div align="center">
 
-**If you like this rice, consider giving it a** ⭐
+**If you like this rice, consider giving it a star!**
 
 </div>
