@@ -1,166 +1,210 @@
+<div align="center">
+
 # StxSaryus's Arch Hyprland Dotfiles
 
-Minimal, modern and performance-tuned Arch Linux + Hyprland rice with Windows 11 style auto-hide Waybar.
+**Minimal, modern and performance-tuned Arch Linux + Hyprland rice**
+**with Windows 11 style auto-hide Waybar**
 
 ![Arch Linux](https://img.shields.io/badge/Arch_Linux-1793D1?style=for-the-badge&logo=arch-linux&logoColor=white)
 ![Hyprland](https://img.shields.io/badge/Hyprland-58E1FF?style=for-the-badge&logo=wayland&logoColor=black)
-![NVIDIA](https://img.shields.io/badge/NVIDIA_1050_Ti-76B900?style=for-the-badge&logo=nvidia&logoColor=white)
+![NVIDIA](https://img.shields.io/badge/NVIDIA-76B900?style=for-the-badge&logo=nvidia&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
+
+</div>
 
 ---
 
-## System Specs
+## Overview
+
+A clean, dependency-free Hyprland setup built from scratch — no framework bloat, no leftover scripts, just what you need. Optimized for NVIDIA laptops with smooth animations and a Windows 11 inspired taskbar experience.
+
+### Highlights
+
+- **Windows 11 style Waybar** — auto-hides at the top, shows on hover, pin/unpin with one click
+- **NVIDIA optimized** — env vars, no hardware cursors, blur/shadow disabled for smooth performance
+- **Instant wallpaper** — hyprpaper loads your wallpaper at boot with zero delay
+- **One-click installer** — `install.sh` handles packages, symlinks, and permissions
+- **10 workspaces** — full keyboard + mouse scroll navigation
+- **Dark glass aesthetic** — translucent bar, rounded corners, minimal icons
+
+---
+
+## System
 
 | Component | Detail |
 |-----------|--------|
 | **OS** | Arch Linux (rolling) |
-| **WM** | Hyprland 0.54+ (Wayland) |
-| **GPU** | NVIDIA GeForce GTX 1050 Ti Mobile (nvidia-dkms-tkg) |
+| **WM** | Hyprland (Wayland) |
+| **GPU** | NVIDIA GeForce GTX 1050 Ti Mobile |
 | **CPU** | Intel Core i7-7700HQ @ 2.80GHz |
 | **RAM** | 16 GB |
-| **Kernel** | linux 6.18+ |
-| **Bar** | Waybar (Win11-style auto-hide) |
+| **Bar** | Waybar |
 | **Terminal** | Kitty |
 | **Shell** | Zsh + Oh-My-Zsh + Powerlevel10k |
 | **Launcher** | Rofi |
-| **File Manager** | Thunar / Dolphin |
-| **Browser** | Firefox |
-| **Notifications** | Dunst / SwayNC |
-| **Wallpaper** | Waypaper (+ hyprpaper backend) |
+| **Notifications** | SwayNC |
+| **Wallpaper** | Waypaper + Hyprpaper |
 | **Lock Screen** | Hyprlock |
 | **Power Menu** | nwg-bar |
-| **Login Manager** | SDDM / greetd + tuigreet |
-| **Audio** | PipeWire + WirePlumber |
+| **Audio** | PipeWire |
 
 ---
 
-## What's Included
+## File Structure
 
 ```
 .
 ├── config/
 │   ├── hypr/
-│   │   ├── hyprland.conf          # Main Hyprland config (NVIDIA tuned)
-│   │   ├── waybar-autohide.sh     # Win11-style show/hide script
-│   │   └── brightness-osd.sh      # Brightness OSD notifications
+│   │   ├── hyprland.conf            # Main Hyprland config (NVIDIA tuned)
+│   │   ├── hyprpaper.conf           # Wallpaper preload (instant boot wallpaper)
+│   │   ├── waybar-autohide.sh       # Win11-style auto show/hide logic
+│   │   ├── brightness-osd.sh        # Brightness change notifications
+│   │   └── wallpaper-sync.sh        # Syncs waypaper choice to hyprpaper.conf
 │   ├── waybar/
-│   │   ├── config.jsonc            # Waybar modules & layout
-│   │   ├── style.css               # Waybar theme (dark glass)
-│   │   ├── sys_stats.sh            # CPU/RAM/Temp combined widget
-│   │   ├── gpu_stats.sh            # NVIDIA GPU stats widget
+│   │   ├── config.jsonc              # Bar modules and layout
+│   │   ├── style.css                 # Dark glass theme
+│   │   ├── sys_stats.sh             # CPU / RAM / Temp widget
+│   │   ├── gpu_stats.sh             # NVIDIA GPU widget
 │   │   └── scripts/
-│   │       ├── lock-icon.sh        # Waybar pin state indicator
-│   │       └── lock-toggle.sh      # Toggle pin/auto-hide
+│   │       ├── lock-icon.sh          # Pin state indicator (🔒/🔓)
+│   │       └── lock-toggle.sh        # Toggle pin / auto-hide
+│   ├── rofi/
+│   │   └── config.rasi               # Launcher theme (dark glass)
+│   ├── kitty/
+│   │   └── kitty.conf                # Terminal config (transparent, beam cursor)
+│   ├── swaync/
+│   │   ├── config.json               # Notification center layout
+│   │   └── style.css                 # Notification theme (dark glass)
+│   ├── waypaper/
+│   │   └── config.ini                # Wallpaper manager settings
+│   └── local-bin/
+│       ├── launcher-toggle.sh        # Rofi toggle (Super+Space)
+│       └── systemupdate.sh           # Waybar update checker
 ├── zsh/
-│   └── .zshrc                      # Zsh + Oh-My-Zsh + Powerlevel10k
+│   └── .zshrc                        # Zsh + Oh-My-Zsh + Powerlevel10k
 ├── bash/
-│   └── .bashrc                     # Bash fallback config
+│   └── .bashrc                       # Bash fallback
 ├── greetd-config-fix/
-│   └── config.toml                 # greetd + tuigreet config
-└── boot-speed/
-    └── ...                         # Fast boot (mkinitcpio tweaks)
+│   └── config.toml                   # greetd + tuigreet config
+├── boot-speed/
+│   └── ...                           # mkinitcpio fast boot tweaks
+├── install.sh                        # One-click installer
+└── README.md
 ```
-
----
-
-## Features
-
-### Waybar (Windows 11 Style)
-
-- **Auto-hide**: Bar hides when mouse leaves, shows when mouse reaches top edge
-- **Pin/Unpin**: Lock icon (🔒/🔓) on the far left — click to toggle between pinned (always visible) and auto-hide mode
-- **Single bar**: All modules in one unified transparent bar with rounded corners
-- **Dark glass theme**: `rgba(15, 15, 20, 0.75)` background with smooth hover effects
-
-### Waybar Modules (Left → Right)
-
-| Module | Description | Click Action |
-|--------|-------------|--------------|
-| 🔒 Lock | Pin/unpin bar | Toggle auto-hide |
-|  Arch | Arch logo | **Left**: Rofi launcher · **Right**: Waypaper |
-| Workspaces | 1-10 workspace indicators | Switch workspace |
-| Window | Active window title | — |
-| ▶ Media | Now playing (Spotify, Firefox...) | **Left**: Play/Pause · **Right**: Next |
-| System | CPU / RAM / Temp stats | **Left**: Toggle detail · **Right**: Open btop |
-| 󰕾 Volume | Audio volume % | **Left**: Pavucontrol · **Scroll**: ±2% |
-| 󰃞 Brightness | Screen brightness % | **Scroll**: ±5% |
-| 🔋 Battery | Charge % + icon | — |
-| 󰸉 Wallpaper | Waypaper launcher | **Left**: Open Waypaper · **Right**: Kill Waypaper |
-| Network | WiFi SSID / Ethernet | **Right**: nm-connection-editor |
-| Bluetooth | Device name + battery | **Left**: Blueman manager |
-| Updates | System update count | **Left**: Run system update |
-|  Clock | Time (click for date) | **Left**: Toggle date/time |
-| 󰐥 Power | Power menu | **Left**: nwg-bar power menu |
 
 ---
 
 ## Keyboard Shortcuts
 
-### General
+### Apps
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + T` | Open Kitty terminal |
-| `Super + B` | Open Firefox |
-| `Super + E` | Open Dolphin file manager |
-| `Super + Space` | Toggle Rofi launcher |
-| `Super + C` | Close active window |
-| `Super + V` | Toggle floating mode |
-| `Super + L` | Lock screen (Hyprlock) |
-| `Shift + F11` | Toggle fullscreen |
-
-### Workspace Navigation
-
-| Shortcut | Action |
-|----------|--------|
-| `Super + 1-9` | Switch to workspace 1-9 |
-| `Super + 0` | Switch to workspace 10 |
-| `Super + Scroll ↑/↓` | Next/previous workspace |
+| `Super + T` | Terminal (Kitty) |
+| `Super + B` | Browser (Firefox) |
+| `Super + E` | File Manager (Dolphin) |
+| `Super + Space` | App Launcher (Rofi) |
+| `Super + L` | Lock Screen (Hyprlock) |
 
 ### Window Management
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + ←/→/↑/↓` | Move focus (left/right/up/down) |
-| `Super + Left Click` (drag) | Move window |
-| `Super + Right Click` (drag) | Resize window |
-| `Super + Alt + 1-9/0` | Send window to workspace (silent) |
-| `Super + Shift + 1-9/0` | Move with window to workspace |
-| `Super + Shift + Scroll ↑/↓` | Move with window to next/prev workspace |
+| `Super + C` | Close window |
+| `Super + Shift + C` | Force kill window (kill -9) |
+| `Super + V` | Toggle floating |
+| `Shift + F11` | Toggle fullscreen |
+| `Super + Arrow Keys` | Move focus |
+| `Super + Left Click` | Drag to move window |
+| `Super + Right Click` | Drag to resize window |
+
+### Workspaces
+
+| Shortcut | Action |
+|----------|--------|
+| `Super + 1-9, 0` | Switch to workspace 1-10 |
+| `Super + Alt + 1-9, 0` | Send window to workspace (silent) |
+| `Super + Shift + 1-9, 0` | Move with window to workspace |
+| `Super + Scroll` | Next / previous workspace |
+| `Super + Shift + Scroll` | Move with window to next / prev |
 
 ### Media & Hardware
 
 | Shortcut | Action |
 |----------|--------|
-| `Fn + Brightness ↑/↓` | Adjust screen brightness (with OSD) |
-| `Fn + Volume ↑/↓` | Adjust volume (±5%) |
-| `Fn + Mute` | Toggle mute |
+| `Fn + Brightness Up/Down` | Adjust brightness (with OSD) |
+| `Fn + Volume Up/Down` | Adjust volume (±5%) |
+| `Fn + Mute` | Toggle speaker mute |
 | `Fn + Mic Mute` | Toggle microphone mute |
-| `XF86AudioPlay` | Play/Pause media |
-| `XF86AudioNext/Prev` | Next/Previous track |
-| `XF86AudioStop` | Stop playback |
+| `Media Play` | Play / Pause |
+| `Media Next / Prev` | Next / Previous track |
+
+---
+
+## Waybar Modules
+
+The bar auto-hides like Windows 11 — move your mouse to the top edge to reveal it.
+
+**Left side:**
+
+| Module | Icon | Click | Right-click |
+|--------|------|-------|-------------|
+| Lock | 🔒 / 🔓 | Toggle pin/auto-hide | — |
+| Arch |  | Rofi launcher | Waypaper |
+| Workspaces | 1-10 | Switch workspace | — |
+| Window title | — | — | — |
+| Media | ▶ / ⏸ | Play/Pause | Next track |
+
+**Right side:**
+
+| Module | Icon | Click | Right-click | Scroll |
+|--------|------|-------|-------------|--------|
+| System | CPU/RAM/Temp | Toggle detail | Open btop | — |
+| Volume | 󰕾 | Pavucontrol | — | ±2% |
+| Brightness | 󰃞 | — | — | ±5% |
+| Battery | 🔋 | — | — | — |
+| Wallpaper | 󰸉 | Open Waypaper | Kill Waypaper | — |
+| Network | WiFi SSID | — | nm-connection-editor | — |
+| Bluetooth | Device | Blueman | — | — |
+| Updates | 󰮯 | Run update | — | — |
+| Clock |  | Toggle date/time | — | — |
+| Power | 󰐥 | Power menu (nwg-bar) | — | — |
 
 ---
 
 ## Installation
 
-### 1. Clone the repo
+### Quick Install
 
 ```bash
 git clone https://github.com/StxSaryus/stxsaryus-s-arch-hyprland-dotfiles.git ~/dotfiles
 cd ~/dotfiles
+chmod +x install.sh
+./install.sh
 ```
 
-### 2. Required packages
+The installer gives you three options:
+1. **Full install** — installs all packages + links configs
+2. **Configs only** — just symlinks (if you already have the packages)
+3. **Packages only** — just installs dependencies
+
+### Manual Install
+
+<details>
+<summary>Click to expand manual steps</summary>
+
+#### 1. Install packages
 
 ```bash
-# Core (Hyprland + NVIDIA)
+# Core
 sudo pacman -S hyprland hyprlock hypridle hyprpaper hyprpicker hyprpolkitagent
 
 # Bar & UI
-sudo pacman -S waybar rofi dunst nwg-bar nwg-look brightnessctl
+sudo pacman -S waybar rofi swaync nwg-bar nwg-look brightnessctl
 
 # Audio
-sudo pacman -S pipewire-pulse pipewire-alsa pipewire-jack pavucontrol pamixer
+sudo pacman -S pipewire-pulse pipewire-alsa pipewire-jack pavucontrol pamixer playerctl
 
 # Bluetooth
 sudo pacman -S bluez bluez-utils blueman
@@ -168,11 +212,11 @@ sudo pacman -S bluez bluez-utils blueman
 # Terminal & Shell
 sudo pacman -S kitty zsh zsh-completions
 
-# Portals (theme & file dialog support)
+# Portals
 sudo pacman -S xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
 
 # Tools
-sudo pacman -S grim slurp swappy cliphist jq imagemagick playerctl
+sudo pacman -S grim slurp swappy cliphist jq imagemagick btop fastfetch
 
 # Fonts
 sudo pacman -S ttf-jetbrains-mono otf-font-awesome ttf-fira-code
@@ -181,39 +225,50 @@ sudo pacman -S ttf-jetbrains-mono otf-font-awesome ttf-fira-code
 yay -S waypaper-git oh-my-zsh-git zsh-theme-powerlevel10k-git
 ```
 
-### 3. Link configs
+#### 2. Link configs
 
 ```bash
 REPO="$HOME/dotfiles"
 
-# Zsh
-mv ~/.zshrc ~/.zshrc.bak 2>/dev/null
-ln -sf "$REPO/zsh/.zshrc" ~/.zshrc
-
-# Bash
-mv ~/.bashrc ~/.bashrc.bak 2>/dev/null
-ln -sf "$REPO/bash/.bashrc" ~/.bashrc
+# Hyprland
+mkdir -p ~/.config/hypr
+for f in hyprland.conf hyprpaper.conf waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh; do
+  ln -sf "$REPO/config/hypr/$f" ~/.config/hypr/$f
+done
 
 # Waybar
 mkdir -p ~/.config/waybar/scripts
-for f in config.jsonc style.css gpu_stats.sh sys_stats.sh; do
-  mv ~/.config/waybar/$f ~/.config/waybar/$f.bak 2>/dev/null
+for f in config.jsonc style.css sys_stats.sh gpu_stats.sh; do
   ln -sf "$REPO/config/waybar/$f" ~/.config/waybar/$f
 done
 ln -sf "$REPO/config/waybar/scripts/lock-icon.sh" ~/.config/waybar/scripts/lock-icon.sh
 ln -sf "$REPO/config/waybar/scripts/lock-toggle.sh" ~/.config/waybar/scripts/lock-toggle.sh
-chmod +x ~/.config/waybar/scripts/*.sh ~/.config/waybar/*.sh
 
-# Hyprland
-mkdir -p ~/.config/hypr
-for f in hyprland.conf waybar-autohide.sh brightness-osd.sh; do
-  mv ~/.config/hypr/$f ~/.config/hypr/$f.bak 2>/dev/null
-  ln -sf "$REPO/config/hypr/$f" ~/.config/hypr/$f
-done
-chmod +x ~/.config/hypr/waybar-autohide.sh ~/.config/hypr/brightness-osd.sh
+# Rofi, Kitty, SwayNC, Waypaper
+ln -sf "$REPO/config/rofi/config.rasi" ~/.config/rofi/config.rasi
+ln -sf "$REPO/config/kitty/kitty.conf" ~/.config/kitty/kitty.conf
+mkdir -p ~/.config/swaync
+ln -sf "$REPO/config/swaync/config.json" ~/.config/swaync/config.json
+ln -sf "$REPO/config/swaync/style.css" ~/.config/swaync/style.css
+ln -sf "$REPO/config/waypaper/config.ini" ~/.config/waypaper/config.ini
+
+# Scripts
+mkdir -p ~/.local/share/bin
+ln -sf "$REPO/config/local-bin/launcher-toggle.sh" ~/.local/share/bin/launcher-toggle.sh
+ln -sf "$REPO/config/local-bin/systemupdate.sh" ~/.local/share/bin/systemupdate.sh
+
+# Shell
+ln -sf "$REPO/zsh/.zshrc" ~/.zshrc
+ln -sf "$REPO/bash/.bashrc" ~/.bashrc
+
+# Permissions
+chmod +x ~/.config/hypr/*.sh ~/.config/waybar/*.sh ~/.config/waybar/scripts/*.sh ~/.local/share/bin/*.sh
+echo "1" > ~/.config/waybar/.pinned
 ```
 
-### 4. Optional: greetd login screen
+</details>
+
+### Optional: greetd Login Screen
 
 ```bash
 sudo pacman -S greetd greetd-tuigreet
@@ -221,15 +276,11 @@ sudo cp greetd-config-fix/config.toml /etc/greetd/config.toml
 sudo systemctl enable greetd
 ```
 
-### 5. Optional: Fast boot
-
-See `boot-speed/` for mkinitcpio optimizations and bootloader timeout tweaks.
-
 ---
 
-## NVIDIA Notes
+## NVIDIA Configuration
 
-This config is tuned for **NVIDIA GTX 1050 Ti** with proprietary drivers (`nvidia-dkms-tkg`). Key environment variables are set in `hyprland.conf`:
+This setup is tuned for **NVIDIA GTX 1050 Ti** with proprietary drivers. The following environment variables are set in `hyprland.conf`:
 
 ```ini
 env = LIBVA_DRIVER_NAME,nvidia
@@ -241,10 +292,41 @@ env = ELECTRON_OZONE_PLATFORM_HINT,auto
 env = MOZ_ENABLE_WAYLAND,1
 ```
 
-Hardware cursors are disabled (`no_hardware_cursors = true`) for NVIDIA compatibility. Blur and shadows are off to keep things smooth on a mobile 1050 Ti.
+Additional NVIDIA tweaks:
+- Hardware cursors disabled (`no_hardware_cursors = true`)
+- Blur and shadows disabled for smooth performance on mobile GPUs
+- Qt forced to Wayland with XCB fallback
+
+> **Note:** If you use a different GPU, remove or adjust the NVIDIA env vars in `hyprland.conf`.
+
+---
+
+## Customization
+
+### Change wallpaper
+Click the 󰸉 icon in waybar (or right-click the Arch icon). The new wallpaper is automatically saved to `hyprpaper.conf` so it loads instantly on next boot.
+
+### Change wallpaper path
+Edit `config/hypr/hyprpaper.conf` — set `preload` and `wallpaper` to your image path.
+
+### Adjust auto-hide behavior
+Edit `config/hypr/waybar-autohide.sh` — tweak the sleep timers and mouse position thresholds.
+
+### Pin the bar permanently
+Click the 🔒 icon on the far left of the bar. When locked (🔒), the bar stays visible. When unlocked (🔓), it auto-hides.
 
 ---
 
 ## Credits
 
-Made by **StxSaryus** — feel free to fork, modify, and make it your own.
+Made by **[StxSaryus](https://github.com/StxSaryus)**
+
+Feel free to fork, modify, and share.
+
+---
+
+<div align="center">
+
+**If you like this rice, consider giving it a** ⭐
+
+</div>
