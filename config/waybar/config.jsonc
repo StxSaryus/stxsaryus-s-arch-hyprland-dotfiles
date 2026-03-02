@@ -21,6 +21,7 @@
         "pulseaudio",
         "backlight",
         "battery",
+        "custom/waypaper",
         "network",
         "bluetooth",
         "custom/updates",
@@ -38,7 +39,7 @@
     "custom/arch": {
         "format": "",
         "tooltip": false,
-        "on-click": "wofi --show drun",
+        "on-click": "~/.local/share/bin/launcher-toggle.sh",
         "on-click-right": "waypaper"
     },
 
@@ -145,6 +146,13 @@
             "mode": "month",
             "on-click-right": "mode"
         }
+    },
+
+    "custom/waypaper": {
+        "format": "󰸉",
+        "tooltip": false,
+        "on-click": "waypaper",
+        "on-click-right": "killall waypaper"
     },
 
     "custom/updates": {
