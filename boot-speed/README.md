@@ -5,7 +5,7 @@
 Şu an initramfs **~285 MB** (NVIDIA modülleri yüzünden). Bunları initramfs’ten çıkarınca dosya ~30 MB’a iner, loader süresi belirgin kısalır.
 
 ```bash
-sudo cp "/home/eren/cursor projects/arch eren config 1/boot-speed/mkinitcpio-optimized.conf" /etc/mkinitcpio.conf
+sudo cp "~/dotfiles/boot-speed/mkinitcpio-optimized.conf" /etc/mkinitcpio.conf
 sudo mkinitcpio -P
 ```
 

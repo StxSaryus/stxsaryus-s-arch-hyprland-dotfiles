@@ -12,7 +12,7 @@ Yapılan değişiklik:
 
 UYGULAMA (tek sefer, terminalde):
 
-  sudo cp "/home/eren/cursor projects/arch eren config 1/greetd-config-fix/config.toml" /etc/greetd/config.toml
+  sudo cp "~/dotfiles/greetd-config-fix/config.toml" /etc/greetd/config.toml
 
 Ardından greetd’i yeniden başlat (isteğe bağlı):
 
