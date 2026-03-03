@@ -6,7 +6,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# --- EREN EDITION v1.0 (FINAL OPTIMIZED) ---
+# --- StxSaryus EDITION v1.0 (FINAL OPTIMIZED) ---
 
 # 1. Path Ayarları
 export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -71,13 +71,13 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=#a61e22'
 # Komutların kendisini çok parlak olmayan beyaz yap
 ZSH_HIGHLIGHT_STYLES[command]='fg=#bac2de'
 
-# Prompt'taki kullanıcı adı (eren) rengini mat maviye sabitle
+# Prompt'taki kullanıcı adı (StxSaryus) rengini mat maviye sabitle
 # %F{...} rengi belirler, %f sıfırlar. 110 numaralı renk çok dengeli bir mavidir.
 PROMPT='%F{110}%n%f%F{242}@%m%f %F{147}%~%f %F{105}❯%f '
 
 # --- SMART FASTFETCH ---
 
-# --- EREN'S SMART FASTFETCH ---
+# --- STXSARYUS SMART FASTFETCH ---
 # Sadece genişlik 120 karakterden fazlaysa logoyu göster
 # Bu sayede ekranı 2'ye veya 4'e böldüğünde görüntü bozulmaz.
 
