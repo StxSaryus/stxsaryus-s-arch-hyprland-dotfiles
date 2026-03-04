@@ -13,7 +13,7 @@ window#waybar {
     transition: all 0.4s ease;
 }
 
-/* ── Modül bölümleri (tek parça, arka plan yok) ───── */
+/* ── Module groups (single bar, no background) ───── */
 .modules-left,
 .modules-center,
 .modules-right {
@@ -22,7 +22,7 @@ window#waybar {
     margin: 0;
 }
 
-/* ── Her modül ────────────────────────────────────── */
+/* ── Generic module styling ───────────────────────── */
 #workspaces button,
 #clock,
 #battery,
@@ -43,7 +43,7 @@ window#waybar {
     transition: all 0.2s ease;
 }
 
-/* ── Hover efekti ────────────────────────────────── */
+/* ── Hover effect ─────────────────────────────────── */
 #clock:hover,
 #battery:hover,
 #network:hover,
@@ -61,7 +61,7 @@ window#waybar {
     border-radius: 8px;
 }
 
-/* ── Kilit ────────────────────────────────────────── */
+/* ── Lock icon ────────────────────────────────────── */
 #custom-lock {
     font-size: 15px;
     padding: 0 14px 0 12px;
@@ -75,14 +75,14 @@ window#waybar {
     border-radius: 8px;
 }
 
-/* ── Arch logo ───────────────────────────────────── */
+/* ── Arch logo ────────────────────────────────────── */
 #custom-arch {
     font-size: 16px;
     color: #ffffff;
     padding: 0 12px 0 8px;
 }
 
-/* ── Workspaces ──────────────────────────────────── */
+/* ── Workspaces ───────────────────────────────────── */
 #workspaces {
     padding: 0 2px;
 }
@@ -108,14 +108,14 @@ window#waybar {
     color: #ff6b6b;
 }
 
-/* ── Window title ────────────────────────────────── */
+/* ── Window title ─────────────────────────────────── */
 #window {
     color: rgba(255, 255, 255, 0.35);
     font-size: 12px;
     padding: 0 6px;
 }
 
-/* ── Media player (sol, hafif vurgulu) ────────────── */
+/* ── Media player (left, slightly highlighted) ────── */
 #group-mpris {
     background: rgba(255, 255, 255, 0.07);
     border-radius: 8px;
@@ -137,14 +137,14 @@ window#waybar {
     color: rgba(255, 255, 255, 0.35);
 }
 
-/* ── Saat ────────────────────────────────────────── */
+/* ── Clock ────────────────────────────────────────── */
 #clock {
     font-weight: 600;
     color: #ffffff;
     padding: 0 10px;
 }
 
-/* ── Batarya ─────────────────────────────────────── */
+/* ── Battery ──────────────────────────────────────── */
 #battery.good {
     color: rgba(255, 255, 255, 0.85);
 }
@@ -167,12 +167,12 @@ window#waybar {
     to   { opacity: 0.4; }
 }
 
-/* ── Ağ ──────────────────────────────────────────── */
+/* ── Network ──────────────────────────────────────── */
 #network.disconnected {
     color: rgba(255, 255, 255, 0.3);
 }
 
-/* ── Bluetooth ───────────────────────────────────── */
+/* ── Bluetooth ────────────────────────────────────── */
 #bluetooth.connected {
     color: #74b9ff;
 }
@@ -181,12 +181,12 @@ window#waybar {
     color: rgba(255, 255, 255, 0.25);
 }
 
-/* ── Ses ─────────────────────────────────────────── */
+/* ── Audio ────────────────────────────────────────── */
 #pulseaudio.muted {
     color: rgba(255, 255, 255, 0.3);
 }
 
-/* ── Stats grubu ─────────────────────────────────── */
+/* ── Stats group ──────────────────────────────────── */
 #group-stats {
     background: rgba(255, 255, 255, 0.07);
     border-radius: 8px;
@@ -198,19 +198,19 @@ window#waybar {
     background: rgba(255, 255, 255, 0.13);
 }
 
-/* ── GPU ─────────────────────────────────────────── */
+/* ── GPU ──────────────────────────────────────────── */
 #custom-gpu {
     color: rgba(255, 255, 255, 0.75);
 }
 
-/* ── Waypaper ────────────────────────────────────── */
+/* ── Waypaper ─────────────────────────────────────── */
 #custom-waypaper {
     font-size: 15px;
     color: rgba(255, 255, 255, 0.6);
     padding: 0 8px;
 }
 
-/* ── Power butonu ────────────────────────────────── */
+/* ── Power button ─────────────────────────────────── */
 #custom-power {
     font-size: 15px;
     padding: 0 8px 0 10px;
