@@ -8,12 +8,12 @@ case "$1" in
   *)    brightnessctl set +0% >/dev/null 2>&1 ;;
 esac
 
-# Yüzdeyi öğren
+# Get current brightness percentage
 percent=$(brightnessctl -m | awk -F, '{gsub("%","",$4); print $4}')
 
-# Dunst üzerinden bildirim (varsa eskiyi değiştir)
+# Show notification via dunst (replace existing if any)
 if command -v dunstify >/dev/null 2>&1; then
-  dunstify -r 9111 -u low "Parlaklık" "${percent}%" \
+  dunstify -r 9111 -u low "Brightness" "${percent}%" \
     -h int:value:"${percent}" \
     -i display-brightness
 fi

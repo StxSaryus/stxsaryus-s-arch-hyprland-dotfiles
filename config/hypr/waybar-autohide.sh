@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tek instance koruması
+# Single-instance guard
 if pidof -x -o $$ "$(basename "$0")" > /dev/null 2>&1; then
     exit 0
 fi
@@ -32,13 +32,13 @@ while true; do
     pinned=0
     is_pinned && pinned=1
 
-    # Kilit durumu değiştiyse
+    # If pin state changed
     if (( pinned != was_pinned )); then
         if (( pinned == 1 )); then
             show_bar
             visible=1
         else
-            # Kilitten çıkınca: hemen gizleme, fare pozisyonuna bak
+            # When unpinned: don't hide immediately, check cursor position
             y=$(hyprctl cursorpos 2>/dev/null | awk -F', ' '{print $2}' | tr -d ' ')
             if [[ "$y" =~ ^[0-9]+$ ]] && (( y > HIDE_ZONE )); then
                 hide_bar
@@ -48,7 +48,7 @@ while true; do
         was_pinned=$pinned
     fi
 
-    # Kilitliyse dokunma
+    # If pinned, skip auto-hide logic
     (( pinned == 1 )) && continue
 
     y=$(hyprctl cursorpos 2>/dev/null | awk -F', ' '{print $2}' | tr -d ' ')

@@ -1,5 +1,5 @@
 #!/bin/bash
-# NVIDIA GPU - kullanım % ve sıcaklık
+# NVIDIA GPU - utilization % and temperature
 
 GPU_UTIL=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | tr -d ' ')
 GPU_TEMP=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | tr -d ' ')
