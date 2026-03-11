@@ -23,7 +23,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 - **Windows 11 style Waybar** — auto-hides at the top, shows on hover, pin/unpin with one click
 - **NVIDIA optimized** — env vars, no hardware cursors, blur/shadow disabled for smooth performance
 - **Instant wallpaper** — hyprpaper loads your wallpaper at boot with zero delay
-- **One-click installer** — `install.sh` handles packages, symlinks, and permissions
+- **Interactive installer** — `install.sh` lets you choose terminal, browser, file manager, launcher, optional components, and keyboard shortcuts; see [INSTALL.md](INSTALL.md) for full details
 - **10 workspaces** — full keyboard + mouse scroll navigation
 - **Dark glass aesthetic** — translucent bar, rounded corners, minimal design
 
@@ -88,7 +88,8 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │   └── config.toml                   # greetd + tuigreet config
 ├── boot-speed/
 │   └── ...                           # mkinitcpio fast boot tweaks
-├── install.sh                        # One-click installer
+├── install.sh                        # Interactive installer (apps + shortcuts)
+├── INSTALL.md                        # Full install guide & shortcut reference
 └── README.md
 ```
 
@@ -183,10 +184,12 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installer gives you three options:
-1. **Full install** — installs all packages + links configs
-2. **Configs only** — just symlinks (if you already have the packages)
-3. **Packages only** — just installs dependencies
+The installer offers three modes:
+1. **Full install** — Interactive: choose terminal, browser, file manager, app launcher, optional components (Waypaper, Btop, greetd, nwg-look), and keyboard shortcuts; then install packages and link configs.
+2. **Configs only** — Link/copy configs with default apps (Kitty, Firefox, Thunar, Rofi) and default shortcuts; no package install.
+3. **Packages only** — Install the default package set only; no config linking.
+
+For a detailed list of application choices, all keyboard shortcuts, and optional components, see **[INSTALL.md](INSTALL.md)**.
 
 ### Manual Install
 
@@ -311,8 +314,8 @@ Edit `config/hypr/waybar-autohide.sh` to tweak sleep timers and mouse position t
 ### Pin the bar permanently
 Click the lock icon on the far left of the bar. When locked, the bar stays visible at all times. When unlocked, it auto-hides when your mouse leaves.
 
-### Change default apps
-Edit `config/hypr/hyprland.conf` — find the keybind section and change the `exec` commands to your preferred apps.
+### Change default apps and shortcuts
+Re-run `./install.sh` and choose **Full install** to pick different apps and shortcuts. Or edit `~/.config/hypr/hyprland.conf` (keybind section) to change `exec` commands and key bindings. See [INSTALL.md](INSTALL.md) for the full shortcut list.
 
 ---
 
