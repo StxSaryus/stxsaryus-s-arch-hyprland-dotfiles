@@ -1,4 +1,25 @@
 *.bak
+*.bak.*
 *.swp
+*.tmp
+*.orig
+*.rej
 *~
 .DS_Store
+Thumbs.db
+.directory
+
+# Editor / IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Local overrides (optional per-machine configs)
+*.local
+*.local.*
+
+# Python (if any tooling is added later)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
