@@ -197,6 +197,7 @@ install_pacman_packages() {
         ttf-jetbrains-mono-nerd otf-font-awesome ttf-fira-code
         network-manager-applet
         base-devel git
+        adw-gtk-theme papirus-icon-theme
     )
     case "$TERMINAL_CMD" in
         kitty) pkgs+=(kitty) ;;
@@ -346,9 +347,14 @@ link_configs() {
         warn "Moved hyprland.lua aside (Hyprland 0.55+ prefers .lua over .conf)"
     fi
     local f
-    for f in waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh hyprpaper.conf; do
+    for f in waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh hyprpaper.conf apply-dark-theme.sh; do
         backup_and_link "$REPO/config/hypr/$f" "$HOME/.config/hypr/$f"
     done
+
+    mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
+    backup_and_link "$REPO/config/gtk-3.0/settings.ini" "$HOME/.config/gtk-3.0/settings.ini"
+    backup_and_link "$REPO/config/gtk-4.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
+    backup_and_link "$REPO/config/gtk-2.0/.gtkrc-2.0" "$HOME/.gtkrc-2.0"
     mkdir -p "$HOME/.config/waybar/scripts"
     for f in config.jsonc style.css sys_stats.sh gpu_stats.sh; do
         backup_and_link "$REPO/config/waybar/$f" "$HOME/.config/waybar/$f"
@@ -381,6 +387,10 @@ set_permissions() {
         "$HOME/.local/share/bin/"*.sh \
         "$REPO/nvidia/setup-nvidia.sh" 2>/dev/null || true
     echo "1" > "$HOME/.config/waybar/.pinned"
+    # Apply dark theme immediately when gsettings is available
+    if [[ -x "$HOME/.config/hypr/apply-dark-theme.sh" ]]; then
+        bash "$HOME/.config/hypr/apply-dark-theme.sh" 2>/dev/null || true
+    fi
 }
 
 setup_default_wallpaper() {
