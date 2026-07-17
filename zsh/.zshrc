@@ -11,7 +11,7 @@ fi
 # --- StxSaryus EDITION v1.0 (FINAL OPTIMIZED) ---
 
 # 1. PATH setup
-export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH
 
 # 2. Oh-My-Zsh location
 export ZSH="$HOME/.oh-my-zsh"

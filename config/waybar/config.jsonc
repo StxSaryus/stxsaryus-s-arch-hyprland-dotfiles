@@ -37,7 +37,7 @@
     },
 
     "custom/arch": {
-        "format": "",
+        "format": "\uf303",
         "tooltip": false,
         "on-click": "~/.local/share/bin/launcher-toggle.sh",
         "on-click-right": "waypaper"
