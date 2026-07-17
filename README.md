@@ -23,7 +23,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 - **Windows 11 style Waybar** — auto-hides at the top, shows on hover, pin/unpin with one click
 - **NVIDIA optimized** — env vars, no hardware cursors, blur/shadow disabled for smooth performance
 - **Instant wallpaper** — hyprpaper loads your wallpaper at boot with zero delay
-- **Interactive installer** — `install.sh` lets you choose terminal, browser, file manager, launcher, optional components, and keyboard shortcuts; see [INSTALL.md](INSTALL.md) for full details
+- **One-command installer** — `./install.sh` auto-installs packages, yay, fonts, configs, and the correct NVIDIA driver (Pascal → `nvidia-580xx-dkms` per Arch News); see [INSTALL.md](INSTALL.md)
 - **10 workspaces** — full keyboard + mouse scroll navigation
 - **Dark glass aesthetic** — translucent bar, rounded corners, minimal design
 
@@ -86,10 +86,15 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │   └── .bashrc                       # Bash fallback
 ├── greetd-config-fix/
 │   └── config.toml                   # greetd + tuigreet config
+├── nvidia/
+│   ├── setup-nvidia.sh               # Standalone NVIDIA / DKMS fix
+│   ├── modprobe-nvidia.conf
+│   ├── blacklist-nouveau.conf
+│   └── modules-load-nvidia.conf
 ├── boot-speed/
 │   └── ...                           # mkinitcpio fast boot tweaks
-├── install.sh                        # Interactive installer (apps + shortcuts)
-├── INSTALL.md                        # Full install guide & shortcut reference
+├── install.sh                        # Fully automatic installer
+├── INSTALL.md                        # Guide + official Arch/NVIDIA notices
 └── README.md
 ```
 
@@ -175,21 +180,33 @@ The bar auto-hides like Windows 11 — move your mouse to the top edge to reveal
 
 ## Installation
 
-### Quick Install
+### Quick Install (fully automatic)
 
 ```bash
 git clone https://github.com/StxSaryus/stxsaryus-s-arch-hyprland-dotfiles.git ~/dotfiles
 cd ~/dotfiles
 chmod +x install.sh
 ./install.sh
+sudo reboot
 ```
 
-The installer offers three modes:
-1. **Full install** — Interactive: choose terminal, browser, file manager, app launcher, optional components (Waypaper, Btop, greetd, nwg-look), and keyboard shortcuts; then install packages and link configs.
-2. **Configs only** — Link/copy configs with default apps (Kitty, Firefox, Thunar, Rofi) and default shortcuts; no package install.
-3. **Packages only** — Install the default package set only; no config linking.
+The installer:
 
-For a detailed list of application choices, all keyboard shortcuts, and optional components, see **[INSTALL.md](INSTALL.md)**.
+1. Prints **official Arch / Hyprland / NVIDIA notices** (with source URLs)
+2. Detects your NVIDIA GPU generation
+3. Installs pacman + AUR packages (installs `yay` if missing)
+4. Sets up the correct NVIDIA driver + DKMS + GRUB `nvidia_drm.modeset=1`
+5. Links configs, Nerd Fonts, wallpaper defaults
+
+| Flag | Behavior |
+|------|----------|
+| `./install.sh` | Auto defaults, one confirm |
+| `./install.sh --auto` | No prompts |
+| `./install.sh --interactive` | Choose apps / shortcuts |
+| `./install.sh --configs` | Configs only |
+| `./install.sh --packages` | Packages + NVIDIA only |
+
+Details, shortcuts, and official quotes: **[INSTALL.md](INSTALL.md)**.
 
 ### Manual Install
 
@@ -220,11 +237,13 @@ sudo pacman -S xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal
 # Tools
 sudo pacman -S grim slurp swappy cliphist jq imagemagick btop fastfetch thunar
 
-# Fonts
-sudo pacman -S ttf-jetbrains-mono otf-font-awesome ttf-fira-code
+# Fonts (Nerd Font required for Waybar icons)
+sudo pacman -S ttf-jetbrains-mono-nerd otf-font-awesome ttf-fira-code
 
-# AUR (via yay)
+# AUR (via yay) — Pascal GPUs also need nvidia-580xx-dkms
 yay -S waypaper-git oh-my-zsh-git zsh-theme-powerlevel10k-git
+# Pascal / GTX 10xx only (Arch News NVIDIA 590):
+# yay -S nvidia-580xx-dkms nvidia-580xx-utils
 ```
 
 #### 2. Link configs
@@ -282,7 +301,21 @@ sudo systemctl enable greetd
 
 ## NVIDIA Configuration
 
-This setup includes NVIDIA-specific environment variables in `hyprland.conf` for proprietary driver compatibility:
+### Official Arch policy (NVIDIA 590+)
+
+Arch Linux News:  
+https://archlinux.org/news/nvidia-590-driver-drops-pascal-support-main-packages-switch-to-open-kernel-modules/
+
+> NVIDIA 590 no longer supports Pascal (GTX 10xx) or older. Use **`nvidia-580xx-dkms`** from the AUR on those cards. Newer GPUs transition to **`nvidia-open`**.
+
+`./install.sh` applies this automatically. Standalone re-fix:
+
+```bash
+sudo ~/dotfiles/nvidia/setup-nvidia.sh
+sudo reboot
+```
+
+### Hyprland env (in `hyprland.conf`)
 
 ```ini
 env = LIBVA_DRIVER_NAME,nvidia
@@ -294,29 +327,15 @@ env = ELECTRON_OZONE_PLATFORM_HINT,auto
 env = MOZ_ENABLE_WAYLAND,1
 ```
 
-Additional tweaks:
-- Hardware cursors disabled (`no_hardware_cursors = true`)
-- Blur and shadows disabled for better performance on mobile GPUs
-- Qt forced to Wayland with XCB fallback
+Tweaks for mobile GPUs: no hardware cursors, blur/shadow off, Qt Wayland + XCB fallback.
 
-> **Note:** If you use an AMD or Intel GPU, remove or comment out the NVIDIA env vars in `hyprland.conf`.
+> AMD/Intel only: comment out the NVIDIA `env` lines in `hyprland.conf`.
 
-### Hyprland 0.55+ notes
+### Hyprland 0.55+
 
-- Remove `dwindle:pseudotile` from config (removed upstream).
-- If both `hyprland.lua` and `hyprland.conf` exist, Hyprland prefers **`.lua`**. The installer moves autogenerated `hyprland.lua` aside automatically.
-- After a fresh install, **log out and back in** so the `.conf` file is loaded.
-
-### NVIDIA driver (post-reinstall)
-
-Packages are included in `install.sh`. If `nvidia-smi` fails after reinstall:
-
-```bash
-sudo ~/dotfiles/nvidia/setup-nvidia.sh
-sudo reboot
-```
-
-This installs modprobe config, loads modules at boot, and adds `nvidia_drm.modeset=1` to GRUB.
+- `dwindle:pseudotile` removed upstream — already gone from this repo.
+- Autogenerated `hyprland.lua` beats `.conf`; installer relocates `.lua`.
+- After install: **reboot** (NVIDIA) then log into Hyprland.
 
 ---
 
@@ -332,7 +351,7 @@ Edit `config/hypr/waybar-autohide.sh` to tweak sleep timers and mouse position t
 Click the lock icon on the far left of the bar. When locked, the bar stays visible at all times. When unlocked, it auto-hides when your mouse leaves.
 
 ### Change default apps and shortcuts
-Re-run `./install.sh` and choose **Full install** to pick different apps and shortcuts. Or edit `~/.config/hypr/hyprland.conf` (keybind section) to change `exec` commands and key bindings. See [INSTALL.md](INSTALL.md) for the full shortcut list.
+`./install.sh --interactive` or edit `~/.config/hypr/hyprland.conf`. See [INSTALL.md](INSTALL.md).
 
 ---
 
