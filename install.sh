@@ -211,7 +211,7 @@ install_packages() {
         zsh zsh-completions
         xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
         grim slurp swappy cliphist jq imagemagick
-        ttf-jetbrains-mono otf-font-awesome ttf-fira-code
+        ttf-jetbrains-mono-nerd otf-font-awesome ttf-fira-code
         network-manager-applet
         nvidia-open nvidia-utils libva-nvidia-driver
     )
