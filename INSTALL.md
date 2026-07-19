@@ -77,6 +77,8 @@ Wiki: https://wiki.hypr.land/Configuring/
 | `./install.sh --packages` | Packages + NVIDIA only |
 | `./install.sh --help` | Help |
 
+After the first install, prefer the Waybar **Updates** module to pull rice changes: it shows notes from `UPDATE_NOTES.md`, asks before applying, then runs `git pull --ff-only` + `./install.sh --configs`. You can still run `--configs` by hand anytime.
+
 ---
 
 ## Defaults (auto mode)
