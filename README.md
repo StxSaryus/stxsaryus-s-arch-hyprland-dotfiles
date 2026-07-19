@@ -79,7 +79,8 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │   │   └── config.ini                # Wallpaper manager settings
 │   └── local-bin/
 │       ├── launcher-toggle.sh        # Rofi toggle (Super+Space)
-│       └── systemupdate.sh           # Waybar update checker
+│       └── systemupdate.sh           # Waybar updates (packages + rice, ask first)
+├── UPDATE_NOTES.md                   # Notes shown before accepting a rice update
 ├── zsh/
 │   └── .zshrc                        # Zsh + Oh-My-Zsh + Powerlevel10k
 ├── bash/
@@ -172,7 +173,7 @@ The bar auto-hides like Windows 11 — move your mouse to the top edge to reveal
 | **Wallpaper** | Wallpaper picker icon | Open Waypaper | Close Waypaper | — |
 | **Network** | WiFi network name or Ethernet | — | Open network settings | — |
 | **Bluetooth** | Connected device name | Open Blueman manager | — | — |
-| **Updates** | Available update count | Run system update in terminal | — | — |
+| **Updates** | Package count + rice commits behind | Confirm menu (packages / dotfiles / both) with update notes | Refresh remote check | — |
 | **Clock** | Current time | Toggle between time and date | — | — |
 | **Power** | Power icon | Open power menu (shutdown, reboot, etc.) | — | — |
 
@@ -207,6 +208,17 @@ The installer:
 | `./install.sh --packages` | Packages + NVIDIA only |
 
 Details, shortcuts, and official quotes: **[INSTALL.md](INSTALL.md)**.
+
+### Updating the rice (Waybar)
+
+The Waybar **Updates** badge watches Arch packages **and** this git repo. When upstream has new commits it shows a git count (e.g. `󰊢 3`) next to the package count.
+
+1. **Left-click** → Kitty menu with `UPDATE_NOTES.md` + pending commit subjects  
+2. Choose packages / dotfiles / both / cancel — nothing runs until you confirm again  
+3. Dotfiles path: `git pull --ff-only` then `./install.sh --configs` (refuses if the clone is dirty)  
+4. **Right-click** → force `git fetch` and redraw the badge  
+
+Maintainers: keep **[UPDATE_NOTES.md](UPDATE_NOTES.md)** short and newest-first whenever you ship plugin/config changes users should notice.
 
 ### Manual Install
 

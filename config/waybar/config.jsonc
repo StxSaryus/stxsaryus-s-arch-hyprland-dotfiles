@@ -160,6 +160,7 @@
         "return-type": "json",
         "format": "{}",
         "on-click": "hyprctl dispatch exec '~/.local/share/bin/systemupdate.sh up'",
+        "on-click-right": "hyprctl dispatch exec '~/.local/share/bin/systemupdate.sh refresh'",
         "interval": 86400,
         "tooltip": true,
         "signal": 20
