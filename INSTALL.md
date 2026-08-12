@@ -98,8 +98,12 @@ greetd: off by default (enable in `--interactive`).
 
 ### Pacman (core)
 
-Hyprland stack, Waybar, SwayNC, PipeWire, Blueman, portals, fonts (`ttf-jetbrains-mono-nerd`),
-`linux-headers`, `dkms`, chosen terminal/browser/FM/launcher.
+Hyprland stack (including `hyprlock`, `hypridle`, `hyprpolkitagent`), Waybar, SwayNC,
+nwg-bar, PipeWire, Blueman, portals, clipboard history (`cliphist`, `wl-clipboard`),
+screenshots (`grim`, `slurp`, `swappy`), shell extras (`zsh-autosuggestions`,
+`zsh-syntax-highlighting`, `lsd`, `fzf`), themes (`adw-gtk-theme`, `papirus-icon-theme`),
+fonts (`ttf-jetbrains-mono-nerd`), `linux-headers`, `dkms`, and your chosen
+terminal / browser / file manager / launcher.
 
 ### AUR (via yay — auto-installed if missing)
 
@@ -107,10 +111,24 @@ Hyprland stack, Waybar, SwayNC, PipeWire, Blueman, portals, fonts (`ttf-jetbrain
 - `waypaper-git` (if enabled)
 - `nvidia-580xx-dkms` + `nvidia-580xx-utils` (Pascal / older only)
 
-### Configs linked / copied
+### Configs
 
-`hypr/`, `waybar/`, `rofi/`, `kitty/`, `swaync/`, `waypaper/`, `~/.local/share/bin/`,
-`.zshrc`, `.bashrc`. `hyprland.conf` is copied and patched (not symlinked).
+Symlinked into `~/.config`, so `git pull` updates the desktop:
+`theme/`, `hypr/`, `waybar/`, `rofi/`, `kitty/`, `swaync/`, `nwg-bar/`,
+`waypaper/style.css`, `gtk-2.0` / `gtk-3.0` / `gtk-4.0`, `~/.local/share/bin/`,
+`.zshrc`, `.bashrc`.
+
+Three exceptions:
+
+| File | Why |
+|------|-----|
+| `hypr/hyprland.conf` | copied, then patched with your app and shortcut choices |
+| `hypr/hyprpaper.conf` | hyprpaper's wallpaper state — written by the wallpaper picker |
+| `waypaper/config.ini` | Waypaper writes its own settings back to this file |
+
+The last two are only created if they do not already exist, so reinstalling
+never loses the wallpaper you picked. Were they symlinks, both applications
+would be editing your git checkout.
 
 ---
 
@@ -121,6 +139,11 @@ Hyprland stack, Waybar, SwayNC, PipeWire, Blueman, portals, fonts (`ttf-jetbrain
    `sudo ~/dotfiles/nvidia/setup-nvidia.sh && sudo reboot`
 3. Wrong Hyprland keybinds / no Waybar → log out/in (remove leftover `hyprland.lua` if any).
 4. Empty Waybar icons → `sudo pacman -S ttf-jetbrains-mono-nerd && fc-cache -fv`
+5. Bar or panels look uncoloured → `~/.config/theme/colors.css` is missing; the
+   stylesheets import it with a relative path, so the whole `theme/` directory
+   has to be linked. Re-run `./install.sh --configs`.
+6. Something feels off before you file a bug → `./tests/run-tests.sh` checks the
+   configs, the palette, the icons, the stylesheets and the installer itself.
 
 Standalone NVIDIA script uses the same Arch News guidance as the main installer.
 
@@ -137,8 +160,19 @@ See also the tables in [README.md](README.md).
 | `Super + E` | File manager |
 | `Super + Space` | App launcher |
 | `Super + L` | Lock |
+| `Super + W` | Wallpaper picker |
+| `Super + N` | Notification centre |
+| `Super + P` | Pin / unpin the bar |
+| `Super + X` | Clipboard history |
 | `Super + C` | Close window |
 | `Super + Shift + C` | Force kill |
 | `Super + V` | Toggle floating |
-| `Shift + F11` | Fullscreen |
+| `Super + F`, `Shift + F11` | Fullscreen |
+| `Super + J` | Toggle split direction |
+| `Super + S` / `Super + Shift + S` | Scratchpad: show / send |
+| `Super + Arrows` | Move focus |
+| `Super + Shift + Arrows` | Move the window |
+| `Super + Ctrl + Arrows` | Resize the window |
 | `Super + 1…0` | Workspaces 1–10 |
+| `Print` / `Shift + Print` | Screenshot: screen / region |
+| `Super + Shift + P` | Pick a colour |

@@ -20,12 +20,13 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 
 ### Highlights
 
+- **One palette, everywhere** — bar, launcher, terminal, notifications, lock screen, session menu and GTK apps all read the same colours from [`config/theme/palette.conf`](config/theme/README.md)
 - **Windows 11 style Waybar** — auto-hides at the top, shows on hover, pin/unpin with one click
-- **NVIDIA optimized** — env vars, no hardware cursors, blur/shadow disabled for smooth performance
+- **NVIDIA optimized** — env vars, software cursors, blur and shadows off, `vfr` on
+- **Cheap when idle** — the stats widget reads `/proc` instead of shelling out to `top`, and the auto-hide watcher polls adaptively with a single process
 - **Instant wallpaper** — hyprpaper loads your wallpaper at boot with zero delay
-- **One-command installer** — `./install.sh` auto-installs packages, yay, fonts, configs, and the correct NVIDIA driver (Pascal → `nvidia-580xx-dkms` per Arch News); see [INSTALL.md](INSTALL.md)
-- **10 workspaces** — full keyboard + mouse scroll navigation
-- **Dark glass aesthetic** — translucent bar, rounded corners, minimal design
+- **One-command installer** — `./install.sh` handles packages, yay, fonts, configs, and the right NVIDIA driver (Pascal → `nvidia-580xx-dkms` per Arch News); see [INSTALL.md](INSTALL.md)
+- **Tested** — `./tests/run-tests.sh` checks the things that otherwise fail silently
 
 ---
 
@@ -41,11 +42,33 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 | **Notification Center** | SwayNC |
 | **Wallpaper Manager** | Waypaper + Hyprpaper |
 | **Screen Lock** | Hyprlock |
+| **Idle Management** | Hypridle |
 | **Power Menu** | nwg-bar |
+| **Clipboard History** | cliphist + wl-clipboard |
+| **Screenshots** | grim + slurp + swappy |
 | **File Manager** | Thunar |
 | **Browser** | Firefox |
 | **Audio Server** | PipeWire |
 | **Bluetooth Manager** | Blueman |
+
+---
+
+## The look
+
+Colours, radii, fonts and icons are defined once and derived for every
+application. The full reference lives in
+**[config/theme/README.md](config/theme/README.md)**.
+
+| | |
+|---|---|
+| Accent | `#33ccff` — Arch cyan |
+| Surfaces | `#07080b` → `#262a36`, blue-tinted dark |
+| Radii | `8px` pills · `12px` windows and cards · `16px` bar, launcher, panels |
+| Font | JetBrainsMono Nerd Font |
+| Icons | Material Design set only — one family, one stroke weight |
+
+Change one line in `config/theme/palette.conf`, run
+`./config/theme/build-theme.sh`, and the whole desktop follows.
 
 ---
 
@@ -54,47 +77,51 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 ```
 .
 ├── config/
+│   ├── theme/
+│   │   ├── palette.conf              # THE colours — edit here
+│   │   ├── build-theme.sh            # regenerates the four files below
+│   │   ├── colors.css                # GTK: waybar, swaync, nwg-bar, waypaper
+│   │   ├── colors.rasi               # rofi
+│   │   ├── colors-kitty.conf         # kitty
+│   │   └── colors-hypr.conf          # hyprland + hyprlock
 │   ├── hypr/
-│   │   ├── hyprland.conf            # Main Hyprland config (NVIDIA tuned)
-│   │   ├── hyprpaper.conf           # Wallpaper preload (instant boot wallpaper)
-│   │   ├── waybar-autohide.sh       # Win11-style auto show/hide logic
-│   │   ├── brightness-osd.sh        # Brightness change notifications
-│   │   └── wallpaper-sync.sh        # Syncs waypaper choice to hyprpaper.conf
+│   │   ├── hyprland.conf             # main config (NVIDIA tuned)
+│   │   ├── hyprlock.conf             # lock screen
+│   │   ├── hypridle.conf             # dim → lock → screen off → suspend
+│   │   ├── hyprpaper.conf            # wallpaper preload (copied, not linked)
+│   │   ├── waybar-autohide.sh        # Win11-style show/hide watcher
+│   │   ├── osd.sh                    # one OSD for brightness, volume and mic
+│   │   ├── wallpaper-sync.sh         # waypaper choice → hyprpaper.conf
+│   │   └── apply-dark-theme.sh       # tells portals/libadwaita it is dark
 │   ├── waybar/
-│   │   ├── config.jsonc              # Bar modules and layout
-│   │   ├── style.css                 # Dark glass theme
-│   │   ├── sys_stats.sh             # CPU / RAM / Temp widget
-│   │   ├── gpu_stats.sh             # NVIDIA GPU widget
+│   │   ├── config.jsonc              # modules and layout
+│   │   ├── style.css                 # bar styling
+│   │   ├── sys_stats.sh              # CPU / GPU / RAM from /proc and /sys
 │   │   └── scripts/
-│   │       ├── lock-icon.sh          # Pin state indicator
-│   │       └── lock-toggle.sh        # Toggle pin / auto-hide
-│   ├── rofi/
-│   │   └── config.rasi               # Launcher theme (dark glass)
-│   ├── kitty/
-│   │   └── kitty.conf                # Terminal config (transparent, beam cursor)
-│   ├── swaync/
-│   │   ├── config.json               # Notification center layout
-│   │   └── style.css                 # Notification theme (dark glass)
-│   ├── waypaper/
-│   │   └── config.ini                # Wallpaper manager settings
+│   │       ├── lock-icon.sh          # pin indicator (signal driven)
+│   │       └── lock-toggle.sh        # pin / unpin the bar
+│   ├── rofi/config.rasi              # launcher
+│   ├── kitty/kitty.conf              # terminal
+│   ├── swaync/                       # notifications + control centre
+│   ├── nwg-bar/                      # session menu
+│   ├── waypaper/                     # wallpaper picker + its GTK style
+│   ├── gtk-2.0/ gtk-3.0/ gtk-4.0/    # dark theme + accent for GTK apps
 │   └── local-bin/
 │       ├── launcher-toggle.sh        # Rofi toggle (Super+Space)
-│       └── systemupdate.sh           # Waybar update checker
-├── zsh/
-│   └── .zshrc                        # Zsh + Oh-My-Zsh + Powerlevel10k
-├── bash/
-│   └── .bashrc                       # Bash fallback
-├── greetd-config-fix/
-│   └── config.toml                   # greetd + tuigreet config
-├── nvidia/
-│   ├── setup-nvidia.sh               # Standalone NVIDIA / DKMS fix
-│   ├── modprobe-nvidia.conf
-│   ├── blacklist-nouveau.conf
-│   └── modules-load-nvidia.conf
-├── boot-speed/
-│   └── ...                           # mkinitcpio fast boot tweaks
-├── install.sh                        # Fully automatic installer
-├── INSTALL.md                        # Guide + official Arch/NVIDIA notices
+│       └── systemupdate.sh           # update counter for the bar
+├── tests/
+│   ├── run-tests.sh                  # everything below, in one command
+│   ├── check_*.py                    # json, palette, glyphs, css, references
+│   ├── test-autohide.sh              # auto-hide behaviour, Hyprland stubbed
+│   ├── bench-*.sh                    # before/after cost of the hot scripts
+│   └── preview/run-preview.sh        # renders the rice headless, screenshots it
+├── zsh/.zshrc                        # Zsh + Oh-My-Zsh + Powerlevel10k
+├── bash/.bashrc                      # Bash fallback
+├── greetd-config-fix/                # greetd + tuigreet
+├── nvidia/                           # driver, DKMS and modprobe setup
+├── boot-speed/                       # mkinitcpio fast boot tweaks
+├── install.sh                        # fully automatic installer
+├── INSTALL.md                        # guide + official Arch/NVIDIA notices
 └── README.md
 ```
 
@@ -106,21 +133,30 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 
 | Shortcut | Action |
 |----------|--------|
-| `Super + T` | Open terminal (Kitty) |
-| `Super + B` | Open browser (Firefox) |
-| `Super + E` | Open file manager (Thunar) |
-| `Super + Space` | Open app launcher (Rofi) |
+| `Super + T` | Terminal (Kitty) |
+| `Super + B` | Browser (Firefox) |
+| `Super + E` | File manager (Thunar) |
+| `Super + Space` | App launcher (Rofi) |
 | `Super + L` | Lock screen (Hyprlock) |
+| `Super + W` | Wallpaper picker (Waypaper) |
+| `Super + N` | Notification centre |
+| `Super + P` | Pin / unpin the bar |
+| `Super + X` | Clipboard history |
 
 ### Window Management
 
 | Shortcut | Action |
 |----------|--------|
 | `Super + C` | Close window (graceful) |
-| `Super + Shift + C` | Force kill window (kill -9) |
-| `Super + V` | Toggle floating mode |
-| `Shift + F11` | Toggle fullscreen |
-| `Super + Arrow Keys` | Move focus between windows |
+| `Super + Shift + C` | Force kill window |
+| `Super + V` | Toggle floating |
+| `Super + F` / `Shift + F11` | Toggle fullscreen |
+| `Super + J` | Toggle split direction |
+| `Super + Arrows` | Move focus |
+| `Super + Shift + Arrows` | Move the window |
+| `Super + Ctrl + Arrows` | Resize the window |
+| `Super + S` | Toggle the scratchpad |
+| `Super + Shift + S` | Send window to the scratchpad |
 | `Super + Left Click` (drag) | Move window |
 | `Super + Right Click` (drag) | Resize window |
 
@@ -129,52 +165,60 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 | Shortcut | Action |
 |----------|--------|
 | `Super + 1-9, 0` | Switch to workspace 1-10 |
-| `Super + Alt + 1-9, 0` | Send window to workspace (silent) |
-| `Super + Shift + 1-9, 0` | Move with window to workspace |
-| `Super + Mouse Scroll` | Next / previous workspace |
-| `Super + Shift + Mouse Scroll` | Move with window to next / prev workspace |
+| `Super + Shift + 1-9, 0` | Move with the window |
+| `Super + Alt + 1-9, 0` | Send the window, stay put |
+| `Super + Scroll` | Next / previous workspace |
+| `Super + Shift + Scroll` | Move with the window |
+
+### Screenshots & Colour
+
+| Shortcut | Action |
+|----------|--------|
+| `Print` | Whole screen → Swappy |
+| `Shift + Print` | Select a region → Swappy |
+| `Super + Shift + P` | Pick a colour (hyprpicker) |
 
 ### Media & Hardware Keys
 
 | Shortcut | Action |
 |----------|--------|
-| `Fn + Brightness Up/Down` | Adjust screen brightness (with OSD notification) |
-| `Fn + Volume Up/Down` | Adjust volume by 5% |
-| `Fn + Mute` | Toggle speaker mute |
-| `Fn + Mic Mute` | Toggle microphone mute |
-| `Media Play/Pause` | Play or pause current media |
-| `Media Next / Previous` | Skip to next or previous track |
+| `Brightness Up/Down` | Adjust brightness, with an OSD |
+| `Volume Up/Down`, `Mute` | Adjust volume, with the same OSD |
+| `Mic Mute` | Toggle the microphone |
+| `Play / Pause / Next / Prev` | playerctl |
 
 ---
 
 ## Waybar Modules
 
-The bar auto-hides like Windows 11 — move your mouse to the top edge to reveal it.
+The bar auto-hides like Windows 11 — move the pointer to the top edge to
+reveal it, or pin it with the padlock on the far left.
 
-### Left Side
+### Left
 
-| Module | What it shows | Click action | Right-click action |
-|--------|--------------|--------------|-------------------|
-| **Pin Toggle** | Locked / Unlocked icon | Toggle between pinned bar and auto-hide | — |
-| **Arch Logo** | Arch Linux icon | Open Rofi app launcher | Open Waypaper wallpaper picker |
-| **Workspaces** | Workspace numbers 1-10 | Switch to that workspace | — |
-| **Window Title** | Active window name | — | — |
-| **Media Player** | Now playing track name | Play / Pause | Next track |
+| Module | Shows | Click | Right click |
+|--------|-------|-------|-------------|
+| **Pin** | Padlock, accent when pinned | Pin / unpin the bar | — |
+| **Arch logo** | Arch mark | App launcher | Wallpaper picker |
+| **Workspaces** | 1-10, current one in accent | Switch | — |
+| **Window title** | Active window | — | — |
+| **Media** | Player icon and track | Play / pause | Next track |
 
-### Right Side
+### Right
 
-| Module | What it shows | Click action | Right-click action | Scroll action |
-|--------|--------------|--------------|-------------------|---------------|
-| **System Stats** | CPU / RAM / Temperature | Toggle between compact and detailed view | Open btop system monitor | — |
-| **Volume** | Speaker volume percentage | Open Pavucontrol mixer | — | Adjust volume by 2% |
-| **Brightness** | Screen brightness percentage | — | — | Adjust brightness by 5% |
-| **Battery** | Battery percentage and state | — | — | — |
-| **Wallpaper** | Wallpaper picker icon | Open Waypaper | Close Waypaper | — |
-| **Network** | WiFi network name or Ethernet | — | Open network settings | — |
-| **Bluetooth** | Connected device name | Open Blueman manager | — | — |
-| **Updates** | Available update count | Run system update in terminal | — | — |
-| **Clock** | Current time | Toggle between time and date | — | — |
-| **Power** | Power icon | Open power menu (shutdown, reboot, etc.) | — | — |
+| Module | Shows | Click | Right click | Scroll |
+|--------|-------|-------|-------------|--------|
+| **System** | CPU / GPU / RAM | Switch load ⇄ temperature | btop | — |
+| **Volume** | Level or muted | Pavucontrol | Mute | ±2% |
+| **Brightness** | Level | — | — | ±5% |
+| **Battery** | Charge and state | — | — | — |
+| **Wallpaper** | Picker | Waypaper | Close Waypaper | — |
+| **Network** | SSID or interface | — | Connection editor | — |
+| **Bluetooth** | Connected device | Blueman | — | — |
+| **Updates** | Pending package count | Upgrade in a terminal | — | — |
+| **Clock** | Time, calendar on hover | Switch to the date | — | Change month |
+| **Notifications** | Bell, accent when unread | Control centre | Do not disturb | — |
+| **Power** | Session menu | nwg-bar | — | — |
 
 ---
 
@@ -206,7 +250,21 @@ The installer:
 | `./install.sh --configs` | Configs only |
 | `./install.sh --packages` | Packages + NVIDIA only |
 
+Application choices can also come from the environment, which is handy for
+scripted reinstalls:
+
+```bash
+TERMINAL_CMD=alacritty KEY_TERMINAL=RETURN ./install.sh --configs
+```
+
 Details, shortcuts, and official quotes: **[INSTALL.md](INSTALL.md)**.
+
+### What gets linked, and what gets copied
+
+Configs are symlinked into `~/.config`, so `git pull` updates your desktop.
+Two files are **copied** instead: `hypr/hyprpaper.conf` and
+`waypaper/config.ini`. Their applications write to them, and a symlink would
+have Waypaper editing your git checkout every time you picked a wallpaper.
 
 ### Manual Install
 
@@ -229,18 +287,21 @@ sudo pacman -S pipewire-pulse pipewire-alsa pipewire-jack pavucontrol pamixer pl
 sudo pacman -S bluez bluez-utils blueman
 
 # Terminal & Shell
-sudo pacman -S kitty zsh zsh-completions
+sudo pacman -S kitty zsh zsh-completions zsh-autosuggestions zsh-syntax-highlighting lsd fzf
 
 # Portals (needed for file dialogs and theme detection)
 sudo pacman -S xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
 
 # Tools
-sudo pacman -S grim slurp swappy cliphist jq imagemagick btop fastfetch thunar
+sudo pacman -S grim slurp swappy cliphist wl-clipboard jq imagemagick btop fastfetch thunar
 
 # Fonts (Nerd Font required for Waybar icons)
 sudo pacman -S ttf-jetbrains-mono-nerd otf-font-awesome ttf-fira-code
 
-# AUR (via yay) — Pascal GPUs also need nvidia-580xx-dkms
+# Themes
+sudo pacman -S adw-gtk-theme papirus-icon-theme
+
+# AUR (via yay)
 yay -S waypaper-git oh-my-zsh-git zsh-theme-powerlevel10k-git
 # Pascal / GTX 10xx only (Arch News NVIDIA 590):
 # yay -S nvidia-580xx-dkms nvidia-580xx-utils
@@ -251,38 +312,55 @@ yay -S waypaper-git oh-my-zsh-git zsh-theme-powerlevel10k-git
 ```bash
 REPO="$HOME/dotfiles"
 
+# Palette — every other config reads this
+mkdir -p ~/.config/theme
+for f in palette.conf build-theme.sh colors.css colors.rasi colors-kitty.conf colors-hypr.conf; do
+  ln -sf "$REPO/config/theme/$f" ~/.config/theme/$f
+done
+
 # Hyprland
 mkdir -p ~/.config/hypr
-for f in hyprland.conf hyprpaper.conf waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh; do
+for f in hyprland.conf hyprlock.conf hypridle.conf waybar-autohide.sh osd.sh wallpaper-sync.sh apply-dark-theme.sh; do
   ln -sf "$REPO/config/hypr/$f" ~/.config/hypr/$f
 done
+cp -n "$REPO/config/hypr/hyprpaper.conf" ~/.config/hypr/hyprpaper.conf
 
 # Waybar
 mkdir -p ~/.config/waybar/scripts
-for f in config.jsonc style.css sys_stats.sh gpu_stats.sh; do
+for f in config.jsonc style.css sys_stats.sh; do
   ln -sf "$REPO/config/waybar/$f" ~/.config/waybar/$f
 done
-ln -sf "$REPO/config/waybar/scripts/lock-icon.sh" ~/.config/waybar/scripts/lock-icon.sh
-ln -sf "$REPO/config/waybar/scripts/lock-toggle.sh" ~/.config/waybar/scripts/lock-toggle.sh
+for f in lock-icon.sh lock-toggle.sh; do
+  ln -sf "$REPO/config/waybar/scripts/$f" ~/.config/waybar/scripts/$f
+done
 
-# Rofi, Kitty, SwayNC, Waypaper
-mkdir -p ~/.config/rofi ~/.config/kitty ~/.config/swaync ~/.config/waypaper
+# Rofi, Kitty, SwayNC, nwg-bar, Waypaper
+mkdir -p ~/.config/{rofi,kitty,swaync,nwg-bar,waypaper}
 ln -sf "$REPO/config/rofi/config.rasi" ~/.config/rofi/config.rasi
 ln -sf "$REPO/config/kitty/kitty.conf" ~/.config/kitty/kitty.conf
 ln -sf "$REPO/config/swaync/config.json" ~/.config/swaync/config.json
 ln -sf "$REPO/config/swaync/style.css" ~/.config/swaync/style.css
-ln -sf "$REPO/config/waypaper/config.ini" ~/.config/waypaper/config.ini
+ln -sf "$REPO/config/nwg-bar/bar.json" ~/.config/nwg-bar/bar.json
+ln -sf "$REPO/config/nwg-bar/style.css" ~/.config/nwg-bar/style.css
+ln -sf "$REPO/config/waypaper/style.css" ~/.config/waypaper/style.css
+cp -n "$REPO/config/waypaper/config.ini" ~/.config/waypaper/config.ini
 
-# Scripts
+# GTK
+mkdir -p ~/.config/gtk-3.0 ~/.config/gtk-4.0
+for v in 3.0 4.0; do
+  ln -sf "$REPO/config/gtk-$v/settings.ini" ~/.config/gtk-$v/settings.ini
+  ln -sf "$REPO/config/gtk-$v/gtk.css" ~/.config/gtk-$v/gtk.css
+done
+ln -sf "$REPO/config/gtk-2.0/.gtkrc-2.0" ~/.gtkrc-2.0
+
+# Scripts and shells
 mkdir -p ~/.local/share/bin
-ln -sf "$REPO/config/local-bin/launcher-toggle.sh" ~/.local/share/bin/launcher-toggle.sh
-ln -sf "$REPO/config/local-bin/systemupdate.sh" ~/.local/share/bin/systemupdate.sh
-
-# Shell
+for f in launcher-toggle.sh systemupdate.sh; do
+  ln -sf "$REPO/config/local-bin/$f" ~/.local/share/bin/$f
+done
 ln -sf "$REPO/zsh/.zshrc" ~/.zshrc
 ln -sf "$REPO/bash/.bashrc" ~/.bashrc
 
-# Permissions
 chmod +x ~/.config/hypr/*.sh ~/.config/waybar/*.sh ~/.config/waybar/scripts/*.sh ~/.local/share/bin/*.sh
 echo "1" > ~/.config/waybar/.pinned
 ```
@@ -319,17 +397,20 @@ sudo reboot
 
 ```ini
 env = LIBVA_DRIVER_NAME,nvidia
-env = XDG_SESSION_TYPE,wayland
 env = GBM_BACKEND,nvidia-drm
 env = __GLX_VENDOR_LIBRARY_NAME,nvidia
 env = NVD_BACKEND,direct
-env = ELECTRON_OZONE_PLATFORM_HINT,auto
+env = XDG_SESSION_TYPE,wayland
 env = MOZ_ENABLE_WAYLAND,1
+env = ELECTRON_OZONE_PLATFORM_HINT,auto
 ```
 
-Tweaks for mobile GPUs: no hardware cursors, blur/shadow off, Qt Wayland + XCB fallback.
+Tweaks for mobile GPUs: software cursors, blur and shadows off, `vfr` on, Qt
+Wayland with an XCB fallback.
 
 > AMD/Intel only: comment out the NVIDIA `env` lines in `hyprland.conf`.
+> Blur is off for the same reason; turn it on in `decoration:blur` if your
+> card can spare the frame time.
 
 ### Hyprland 0.55+
 
@@ -339,19 +420,77 @@ Tweaks for mobile GPUs: no hardware cursors, blur/shadow off, Qt Wayland + XCB f
 
 ---
 
+## Tests
+
+```bash
+./tests/run-tests.sh
+```
+
+Eleven groups of checks, all aimed at the failures this kind of repo has that
+never announce themselves:
+
+| Check | Catches |
+|-------|---------|
+| shell syntax, shellcheck | broken and sloppy scripts |
+| theme in sync | generated colour files that drifted from `palette.conf` |
+| json configs | malformed JSON, modules placed but never defined, empty icons |
+| palette discipline | any colour under `config/` that is not in the palette |
+| nerd font glyphs | icons missing from the font, or from the wrong icon family |
+| gtk stylesheets | CSS that GTK silently drops |
+| cross references | a config pointing at a file the repo does not ship, or a file `install.sh` forgot |
+| hyprland config | undeclared variables, unbalanced braces, duplicate keybinds |
+| installer | broken links, unresolved imports, or the installer writing into the checkout |
+| waybar autohide | show / hide / pin behaviour, and the idle poll budget |
+
+Two benchmarks compare the hot scripts against any earlier revision:
+
+```bash
+./tests/bench-sysstats.sh 20 origin/main
+./tests/bench-autohide.sh 10 origin/main
+```
+
+And the whole rice can be rendered without a login session — headless sway,
+the real Waybar config, real stylesheets, screenshots at the end:
+
+```bash
+./tests/preview/run-preview.sh
+```
+
+---
+
 ## Customization
 
+### Recolour everything
+
+Edit `config/theme/palette.conf`, then:
+
+```bash
+./config/theme/build-theme.sh
+```
+
+Hyprland borders, the bar, launcher, terminal, notifications, lock screen,
+session menu and GTK apps all pick up the change. See
+[config/theme/README.md](config/theme/README.md).
+
 ### Change wallpaper
-Click the wallpaper icon in the waybar (or right-click the Arch logo). Your new wallpaper is automatically saved to `hyprpaper.conf` so it loads instantly on next boot.
 
-### Adjust auto-hide behavior
-Edit `config/hypr/waybar-autohide.sh` to tweak sleep timers and mouse position thresholds.
+Click the wallpaper icon in the bar (or right-click the Arch logo). Your
+choice is written to `hyprpaper.conf`, so it is on screen at next boot.
 
-### Pin the bar permanently
-Click the lock icon on the far left of the bar. When locked, the bar stays visible at all times. When unlocked, it auto-hides when your mouse leaves.
+### Adjust auto-hide behaviour
+
+`config/hypr/waybar-autohide.sh` — the reveal and hide zones and the two poll
+intervals are named constants at the top.
+
+### Pin the bar
+
+Click the padlock at the far left, or press `Super + P`. Pinned, the bar stays
+visible; unpinned, it hides when the pointer leaves.
 
 ### Change default apps and shortcuts
-`./install.sh --interactive` or edit `~/.config/hypr/hyprland.conf`. See [INSTALL.md](INSTALL.md).
+
+`./install.sh --interactive`, or edit the five variables at the top of
+`~/.config/hypr/hyprland.conf`.
 
 ---
 
