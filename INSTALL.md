@@ -134,6 +134,11 @@ would be editing your git checkout.
 
 ## After install / troubleshooting
 
+**Start here:** `./doctor.sh` checks the installed rice and prints exactly
+what is missing or broken, each with the command that fixes it. A button that
+calls a program you do not have installed behaves exactly like a broken
+button, and this is the quickest way to tell the two apart.
+
 1. **Always reboot** after NVIDIA DKMS install.
 2. `nvidia-smi` fails →  
    `sudo ~/dotfiles/nvidia/setup-nvidia.sh && sudo reboot`
