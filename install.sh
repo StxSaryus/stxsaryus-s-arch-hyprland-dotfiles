@@ -199,6 +199,7 @@ install_pacman_packages() {
         zsh zsh-completions zsh-autosuggestions zsh-syntax-highlighting
         xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
         grim slurp swappy cliphist wl-clipboard jq imagemagick
+        libnotify pacman-contrib
         ttf-jetbrains-mono-nerd otf-font-awesome ttf-fira-code
         network-manager-applet
         base-devel git
@@ -431,7 +432,7 @@ link_configs() {
     copy_if_missing "$REPO/config/waypaper/config.ini" "$HOME/.config/waypaper/config.ini"
 
     mkdir -p "$HOME/.local/share/bin"
-    for f in launcher-toggle.sh systemupdate.sh; do
+    for f in launcher-toggle.sh waypaper-toggle.sh systemupdate.sh; do
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/share/bin/$f"
     done
 

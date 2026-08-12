@@ -77,6 +77,7 @@ test_palette()    { python3 tests/check_palette.py; }
 test_glyphs()     { python3 tests/check_glyphs.py; }
 test_css()        { python3 tests/check_css.py; }
 test_references() { python3 tests/check_references.py; }
+test_commands()   { python3 tests/check_commands.py; }
 
 # ── 8. Hyprland config sanity ────────────────────────────────
 test_hyprland() {
@@ -236,6 +237,7 @@ run "palette discipline"  test_palette
 run "nerd font glyphs"    test_glyphs
 run "gtk stylesheets"     test_css
 run "cross references"    test_references
+run "bind/click commands" test_commands
 run "hyprland config"     test_hyprland
 run "installer"           test_installer
 run "waybar autohide"     test_autohide
