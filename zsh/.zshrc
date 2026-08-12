@@ -16,14 +16,17 @@ export EDITOR="${EDITOR:-nano}"
 export TERMINAL="${TERMINAL:-kitty}"
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
-plugins=(git archlinux sudo zsh-autosuggestions zsh-syntax-highlighting)
+# Only the plugins Oh My Zsh ships. Arch installs zsh-autosuggestions and
+# zsh-syntax-highlighting under /usr/share, where Oh My Zsh does not look,
+# so those are sourced by hand further down.
+plugins=(git archlinux sudo)
 
 # ── Prompt ───────────────────────────────────────────────────
 # A lean two-segment prompt in the rice palette. Defining these means
 # Powerlevel10k skips its configuration wizard; run `p10k configure`
 # any time you want the full interactive version instead.
 typeset -g POWERLEVEL9K_MODE=nerdfont-v3
-typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs)
+typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(dir vcs prompt_char)
 typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status command_execution_time background_jobs time)
 typeset -g POWERLEVEL9K_PROMPT_ADD_NEWLINE=false
 typeset -g POWERLEVEL9K_BACKGROUND=
@@ -52,17 +55,11 @@ typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M}'
 
 [[ -r "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
-# ── Syntax highlighting, in palette ──────────────────────────
-typeset -gA ZSH_HIGHLIGHT_STYLES
-ZSH_HIGHLIGHT_STYLES[comment]='fg=245'
-ZSH_HIGHLIGHT_STYLES[command]='fg=81'
-ZSH_HIGHLIGHT_STYLES[builtin]='fg=81'
-ZSH_HIGHLIGHT_STYLES[alias]='fg=81'
-ZSH_HIGHLIGHT_STYLES[function]='fg=111'
-ZSH_HIGHLIGHT_STYLES[path]='fg=252,underline'
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=151'
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=151'
-ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=211'
+# ── Autosuggestions ──────────────────────────────────────────
+for _p in /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh \
+          "$ZSH/custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"; do
+    [[ -r "$_p" ]] && { source "$_p"; break; }
+done
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=240'
 
 # ── History ──────────────────────────────────────────────────
@@ -96,6 +93,27 @@ alias reload='exec zsh'
 # ── fzf ──────────────────────────────────────────────────────
 [[ -r /usr/share/fzf/key-bindings.zsh ]] && source /usr/share/fzf/key-bindings.zsh
 [[ -r /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
+
+# ── Syntax highlighting ──────────────────────────────────────
+# Has to be sourced after everything else it should highlight, and the
+# styles have to be set after the plugin has filled in its defaults.
+for _p in /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+          "$ZSH/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"; do
+    [[ -r "$_p" ]] && { source "$_p"; break; }
+done
+unset _p
+
+if (( ${+ZSH_HIGHLIGHT_STYLES} )); then
+    ZSH_HIGHLIGHT_STYLES[comment]='fg=245'
+    ZSH_HIGHLIGHT_STYLES[command]='fg=81'
+    ZSH_HIGHLIGHT_STYLES[builtin]='fg=81'
+    ZSH_HIGHLIGHT_STYLES[alias]='fg=81'
+    ZSH_HIGHLIGHT_STYLES[function]='fg=111'
+    ZSH_HIGHLIGHT_STYLES[path]='fg=252,underline'
+    ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=151'
+    ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=151'
+    ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=211'
+fi
 
 # ── Greeting: only on a terminal wide enough for the logo ────
 if [[ -o interactive ]] && (( COLUMNS >= 120 )) && command -v fastfetch >/dev/null 2>&1; then

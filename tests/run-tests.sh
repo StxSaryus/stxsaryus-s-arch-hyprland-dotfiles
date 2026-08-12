@@ -41,7 +41,13 @@ test_syntax() {
     while read -r f; do
         bash -n "$f" || { echo "  FAIL $f"; rc=1; }
     done < <(scripts)
-    (( rc == 0 )) && echo "  ok   every shell script parses"
+    bash -n bash/.bashrc || { echo "  FAIL bash/.bashrc"; rc=1; }
+    if command -v zsh >/dev/null 2>&1; then
+        zsh -n zsh/.zshrc || { echo "  FAIL zsh/.zshrc"; rc=1; }
+    else
+        printf '  %bskip zsh is not installed, .zshrc unchecked%b\n' "$YELLOW" "$NC"
+    fi
+    (( rc == 0 )) && echo "  ok   every shell script and both shell rc files parse"
     return $rc
 }
 
