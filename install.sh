@@ -31,15 +31,20 @@ MODE="auto"
 SKIP_CONFIRM=0
 SUDO_KEEPALIVE_PID=""
 
-TERMINAL_CMD="kitty"
-BROWSER_CMD="firefox"
-FILE_MANAGER_CMD="thunar"
-LAUNCHER_CMD="~/.local/share/bin/launcher-toggle.sh"
-KEY_TERMINAL="T"
-KEY_BROWSER="B"
-KEY_FILE_MANAGER="E"
-KEY_LAUNCHER="SPACE"
-KEY_LOCK="L"
+# Defaults, overridable from the environment for scripted installs:
+#   TERMINAL_CMD=alacritty KEY_TERMINAL=RETURN ./install.sh --configs
+TERMINAL_CMD="${TERMINAL_CMD:-kitty}"
+BROWSER_CMD="${BROWSER_CMD:-firefox}"
+FILE_MANAGER_CMD="${FILE_MANAGER_CMD:-thunar}"
+# Literal tilde on purpose: this string is written into hyprland.conf,
+# where Hyprland does the expanding.
+# shellcheck disable=SC2088
+LAUNCHER_CMD="${LAUNCHER_CMD:-~/.local/share/bin/launcher-toggle.sh}"
+KEY_TERMINAL="${KEY_TERMINAL:-T}"
+KEY_BROWSER="${KEY_BROWSER:-B}"
+KEY_FILE_MANAGER="${KEY_FILE_MANAGER:-E}"
+KEY_LAUNCHER="${KEY_LAUNCHER:-SPACE}"
+KEY_LOCK="${KEY_LOCK:-L}"
 
 OPT_WAYPAPER=1
 OPT_BTOP=1
@@ -191,13 +196,14 @@ install_pacman_packages() {
         waybar swaync nwg-bar brightnessctl
         pipewire-pulse pipewire-alsa pipewire-jack pavucontrol pamixer playerctl
         bluez bluez-utils blueman
-        zsh zsh-completions
+        zsh zsh-completions zsh-autosuggestions zsh-syntax-highlighting
         xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
-        grim slurp swappy cliphist jq imagemagick
+        grim slurp swappy cliphist wl-clipboard jq imagemagick
         ttf-jetbrains-mono-nerd otf-font-awesome ttf-fira-code
         network-manager-applet
         base-devel git
         adw-gtk-theme papirus-icon-theme
+        lsd fzf
     )
     case "$TERMINAL_CMD" in
         kitty) pkgs+=(kitty) ;;
@@ -314,6 +320,29 @@ backup_and_link() {
     ln -sf "$src" "$dest"
 }
 
+# For files the applications write back into (wallpaper state, waypaper's own
+# settings). Symlinking those would have them edit the git checkout.
+copy_if_missing() {
+    local src="$1" dest="$2"
+    mkdir -p "$(dirname "$dest")"
+    [[ -L "$dest" ]] && rm -f "$dest"
+    [[ -e "$dest" ]] && return 0
+    cp "$src" "$dest"
+}
+
+# Symlinks created by older versions of this repo
+clean_stale_links() {
+    local stale=(
+        "$HOME/.config/hypr/brightness-osd.sh"
+        "$HOME/.config/waybar/gpu_stats.sh"
+    )
+    local f
+    for f in "${stale[@]}"; do
+        [[ -L "$f" ]] && rm -f "$f" && info "Removed stale link: ${f/#$HOME/\~}"
+    done
+    return 0
+}
+
 copy_and_patch_hypr() {
     mkdir -p "$(dirname "$HYPR_CONF")"
     if [[ -e "$HYPR_CONF" && ! -L "$HYPR_CONF" ]]; then
@@ -323,57 +352,92 @@ copy_and_patch_hypr() {
     cp "$REPO/config/hypr/hyprland.conf" "$HYPR_CONF"
 }
 
+# hyprland.conf declares $terminal / $browser / ... once at the top and every
+# bind refers to those, so a choice is a single line rewrite.
+set_hypr_var() {
+    local name="$1" value="$2"
+    value="${value//\\/\\\\}"
+    value="${value//&/\\&}"
+    value="${value//|/\\|}"
+    sed -i "s|^[\$]${name} = .*|\$${name} = ${value}|" "$HYPR_CONF"
+}
+
+set_hypr_key() {
+    local default_key="$1" new_key="$2" var="$3"
+    [[ "$default_key" == "$new_key" ]] && return 0
+    sed -i "s|^bind = [\$]mainMod, ${default_key}, exec, [\$]${var}\$|bind = \$mainMod, ${new_key}, exec, \$${var}|" "$HYPR_CONF"
+}
+
 patch_hyprland_conf() {
-    local term_esc="${TERMINAL_CMD//\//\\/}"
-    local browser_esc="${BROWSER_CMD//\//\\/}"
-    local fm_esc="${FILE_MANAGER_CMD//\//\\/}"
-    local launch_esc="${LAUNCHER_CMD//\//\\/}"
-    launch_esc="${launch_esc//&/\\&}"
-    sed -i "s/exec, kitty/exec, $term_esc/" "$HYPR_CONF"
-    sed -i "s/exec, firefox/exec, $browser_esc/" "$HYPR_CONF"
-    sed -i "s/exec, thunar/exec, $fm_esc/" "$HYPR_CONF"
-    sed -i "s|exec, ~/.local/share/bin/launcher-toggle.sh|exec, $launch_esc|" "$HYPR_CONF"
-    sed -i "s/\$mainMod, T, exec,/\$mainMod, $KEY_TERMINAL, exec,/" "$HYPR_CONF"
-    sed -i "s/\$mainMod, B, exec,/\$mainMod, $KEY_BROWSER, exec,/" "$HYPR_CONF"
-    sed -i "s/\$mainMod, E, exec,/\$mainMod, $KEY_FILE_MANAGER, exec,/" "$HYPR_CONF"
-    sed -i "s/\$mainMod, SPACE, exec,/\$mainMod, $KEY_LAUNCHER, exec,/" "$HYPR_CONF"
-    sed -i "s/\$mainMod, L, exec,/\$mainMod, $KEY_LOCK, exec,/" "$HYPR_CONF"
+    set_hypr_var terminal "$TERMINAL_CMD"
+    set_hypr_var browser "$BROWSER_CMD"
+    set_hypr_var fileManager "$FILE_MANAGER_CMD"
+    set_hypr_var launcher "$LAUNCHER_CMD"
+
+    set_hypr_key T "$KEY_TERMINAL" terminal
+    set_hypr_key B "$KEY_BROWSER" browser
+    set_hypr_key E "$KEY_FILE_MANAGER" fileManager
+    set_hypr_key SPACE "$KEY_LAUNCHER" launcher
+    set_hypr_key L "$KEY_LOCK" lockCmd
 }
 
 link_configs() {
     section "Linking configs"
+    clean_stale_links
+
     if [[ -f "$HYPR_DEST/hyprland.lua" ]]; then
         mv "$HYPR_DEST/hyprland.lua" "$HYPR_DEST/hyprland.lua.bak.$(date +%s)"
         warn "Moved hyprland.lua aside (Hyprland 0.55+ prefers .lua over .conf)"
     fi
+
     local f
-    for f in waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh hyprpaper.conf apply-dark-theme.sh; do
-        backup_and_link "$REPO/config/hypr/$f" "$HOME/.config/hypr/$f"
+
+    # The palette every other config reads
+    for f in palette.conf build-theme.sh colors.css colors.rasi colors-kitty.conf colors-hypr.conf; do
+        backup_and_link "$REPO/config/theme/$f" "$HOME/.config/theme/$f"
     done
 
+    for f in waybar-autohide.sh osd.sh wallpaper-sync.sh apply-dark-theme.sh hyprlock.conf hypridle.conf; do
+        backup_and_link "$REPO/config/hypr/$f" "$HOME/.config/hypr/$f"
+    done
+    copy_if_missing "$REPO/config/hypr/hyprpaper.conf" "$HOME/.config/hypr/hyprpaper.conf"
+
     mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
-    backup_and_link "$REPO/config/gtk-3.0/settings.ini" "$HOME/.config/gtk-3.0/settings.ini"
-    backup_and_link "$REPO/config/gtk-4.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
+    for f in settings.ini gtk.css; do
+        backup_and_link "$REPO/config/gtk-3.0/$f" "$HOME/.config/gtk-3.0/$f"
+        backup_and_link "$REPO/config/gtk-4.0/$f" "$HOME/.config/gtk-4.0/$f"
+    done
     backup_and_link "$REPO/config/gtk-2.0/.gtkrc-2.0" "$HOME/.gtkrc-2.0"
+
     mkdir -p "$HOME/.config/waybar/scripts"
-    for f in config.jsonc style.css sys_stats.sh gpu_stats.sh; do
+    for f in config.jsonc style.css sys_stats.sh; do
         backup_and_link "$REPO/config/waybar/$f" "$HOME/.config/waybar/$f"
     done
     for f in lock-icon.sh lock-toggle.sh; do
         backup_and_link "$REPO/config/waybar/scripts/$f" "$HOME/.config/waybar/scripts/$f"
     done
+
     backup_and_link "$REPO/config/rofi/config.rasi" "$HOME/.config/rofi/config.rasi"
     backup_and_link "$REPO/config/kitty/kitty.conf" "$HOME/.config/kitty/kitty.conf"
+
     for f in config.json style.css; do
         backup_and_link "$REPO/config/swaync/$f" "$HOME/.config/swaync/$f"
     done
-    backup_and_link "$REPO/config/waypaper/config.ini" "$HOME/.config/waypaper/config.ini"
+    for f in bar.json style.css; do
+        backup_and_link "$REPO/config/nwg-bar/$f" "$HOME/.config/nwg-bar/$f"
+    done
+
+    backup_and_link "$REPO/config/waypaper/style.css" "$HOME/.config/waypaper/style.css"
+    copy_if_missing "$REPO/config/waypaper/config.ini" "$HOME/.config/waypaper/config.ini"
+
     mkdir -p "$HOME/.local/share/bin"
     for f in launcher-toggle.sh systemupdate.sh; do
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/share/bin/$f"
     done
+
     backup_and_link "$REPO/zsh/.zshrc" "$HOME/.zshrc"
     backup_and_link "$REPO/bash/.bashrc" "$HOME/.bashrc"
+
     copy_and_patch_hypr
     patch_hyprland_conf
     success "Configs linked + hyprland.conf patched"
@@ -382,6 +446,7 @@ link_configs() {
 set_permissions() {
     chmod +x \
         "$HOME/.config/hypr/"*.sh \
+        "$HOME/.config/theme/build-theme.sh" \
         "$HOME/.config/waybar/"*.sh \
         "$HOME/.config/waybar/scripts/"*.sh \
         "$HOME/.local/share/bin/"*.sh \
@@ -433,6 +498,7 @@ prompt_interactive() {
     case "${c:-1}" in 2) FILE_MANAGER_CMD=nautilus ;; 3) FILE_MANAGER_CMD=dolphin ;; 4) FILE_MANAGER_CMD=nemo ;; 5) FILE_MANAGER_CMD=pcmanfm ;; *) FILE_MANAGER_CMD=thunar ;; esac
     echo "Launcher: 1) Rofi  2) Fuzzel  3) Wofi"
     read -rp "Choice [1]: " c
+    # shellcheck disable=SC2088  # tilde is expanded by Hyprland, not the shell
     case "${c:-1}" in 2) LAUNCHER_CMD=fuzzel ;; 3) LAUNCHER_CMD="wofi --show drun" ;; *) LAUNCHER_CMD="~/.local/share/bin/launcher-toggle.sh" ;; esac
     read -rp "Waypaper (AUR)? [Y/n]: " c; [[ "${c,,}" == "n" ]] && OPT_WAYPAPER=0
     read -rp "Btop? [Y/n]: " c; [[ "${c,,}" == "n" ]] && OPT_BTOP=0
