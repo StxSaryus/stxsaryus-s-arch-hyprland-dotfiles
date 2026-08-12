@@ -62,7 +62,7 @@
         "format": "󰣇",
         "tooltip-format": "Left click: app launcher\nRight click: wallpaper picker",
         "on-click": "~/.local/share/bin/launcher-toggle.sh",
-        "on-click-right": "waypaper"
+        "on-click-right": "~/.local/share/bin/waypaper-toggle.sh"
     },
 
     "hyprland/workspaces": {
@@ -149,9 +149,9 @@
 
     "custom/waypaper": {
         "format": "󰸉",
-        "tooltip-format": "Change wallpaper",
-        "on-click": "waypaper",
-        "on-click-right": "killall waypaper"
+        "tooltip-format": "Wallpaper picker",
+        "on-click": "~/.local/share/bin/waypaper-toggle.sh",
+        "on-click-right": "~/.local/share/bin/waypaper-toggle.sh"
     },
 
     "network": {

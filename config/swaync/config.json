@@ -85,7 +85,7 @@
         },
         {
           "label": "󰸉",
-          "command": "waypaper"
+          "command": "~/.local/share/bin/waypaper-toggle.sh"
         }
       ]
     }

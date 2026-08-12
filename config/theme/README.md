@@ -24,6 +24,11 @@ The generated files are committed, so the installer never has to run anything.
 `tests/run-tests.sh` runs that check along with one that rejects any colour
 under `config/` that is not in the palette.
 
+One exception to the diagram: Waypaper hands its stylesheet to GTK as raw
+bytes rather than as a path, so `@import` has nothing to resolve against and
+crashes it. `build-theme.sh` writes the palette straight into the marked
+block at the top of `config/waypaper/style.css` instead.
+
 ## The palette
 
 | Token | Value | Where it shows up |

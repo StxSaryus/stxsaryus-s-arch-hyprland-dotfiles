@@ -212,7 +212,7 @@ reveal it, or pin it with the padlock on the far left.
 | **Volume** | Level or muted | Pavucontrol | Mute | ±2% |
 | **Brightness** | Level | — | — | ±5% |
 | **Battery** | Charge and state | — | — | — |
-| **Wallpaper** | Picker | Waypaper | Close Waypaper | — |
+| **Wallpaper** | Picker | Open the picker, or close it if open | Same | — |
 | **Network** | SSID or interface | — | Connection editor | — |
 | **Bluetooth** | Connected device | Blueman | — | — |
 | **Updates** | Pending package count | Upgrade in a terminal | — | — |

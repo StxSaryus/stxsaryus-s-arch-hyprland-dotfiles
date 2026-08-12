@@ -49,6 +49,39 @@ bright_green=$(lighten "$green" 0.18)
 bright_yellow=$(lighten "$yellow" 0.18)
 bright_blue=$(lighten "$blue" 0.18)
 
+# Replaces the block between the markers in a hand-written file. Needed for
+# stylesheets that an application feeds to GTK as raw data rather than as a
+# path: those have no base directory, so @import cannot resolve.
+inject() {
+    local target="$1" block="$2" tmp
+    tmp="$(mktemp)"
+    awk -v block="$block" '
+        /BEGIN generated palette/ { print; print block; skip = 1; next }
+        /END generated palette/   { skip = 0 }
+        !skip { print }
+    ' "$target" >"$tmp"
+
+    if ! grep -q "BEGIN generated palette" "$target"; then
+        echo "MISSING MARKER: ${target#"$THEME_DIR"/../} has no palette block" >&2
+        rm -f "$tmp"
+        return 1
+    fi
+
+    if (( CHECK )); then
+        if ! diff -q "$target" "$tmp" >/dev/null 2>&1; then
+            echo "OUT OF DATE: $target  (run config/theme/build-theme.sh)" >&2
+            diff -u "$target" "$tmp" | head -30 >&2 || true
+            rm -f "$tmp"
+            return 1
+        fi
+        rm -f "$tmp"
+    else
+        cat "$tmp" >"$target"
+        rm -f "$tmp"
+        echo "  updated palette block in ${target##*/config/}"
+    fi
+}
+
 write() {
     local target="$1" tmp
     tmp="$(mktemp)"
@@ -222,6 +255,11 @@ write "$THEME_DIR/colors-hypr.conf" <<EOF
 \$lockField      = rgba(${surface}cc)
 \$lockShadow     = rgba(00000066)
 EOF
+
+# --- Waypaper ------------------------------------------------------------
+# Waypaper reads its stylesheet and hands GTK the bytes, so it gets the
+# palette inlined instead of imported.
+inject "$THEME_DIR/../waypaper/style.css" "$(sed -n '/^@define-color/p' "$THEME_DIR/colors.css")"
 
 if (( CHECK )); then
     echo "theme files are in sync with palette.conf"

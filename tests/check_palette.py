@@ -56,6 +56,14 @@ def main() -> int:
             continue
 
         text = path.read_text(encoding="utf-8", errors="replace")
+        # Blank out generated blocks, keeping line numbers intact, so the
+        # hand-written rules around them are still held to the rule.
+        text = re.sub(
+            r"(BEGIN generated palette[^\n]*\n)(.*?)(^[^\n]*END generated palette)",
+            lambda m: m.group(1) + "\n" * m.group(2).count("\n") + m.group(3),
+            text,
+            flags=re.S | re.M,
+        )
         for match in HEX.finditer(text):
             value = match.group(1).lower()
             if value not in allowed:
