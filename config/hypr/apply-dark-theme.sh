@@ -1,29 +1,17 @@
 #!/usr/bin/env bash
-# Apply system dark theme (GTK / icons / portals). Safe to run every login.
-set -euo pipefail
+# Tells the GNOME/portal side of the world that this is a dark session, so
+# libadwaita apps, file pickers and Flatpaks match the rest of the rice.
+# Safe to run on every login. The GTK ini/css files themselves are installed
+# by install.sh.
+set -uo pipefail
 
-export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+command -v gsettings >/dev/null 2>&1 || exit 0
 
-# libadwaita / xdg-desktop-portal
-if command -v gsettings >/dev/null; then
-    gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null || true
-    gsettings set org.gnome.desktop.interface gtk-theme 'adw-gtk3-dark' 2>/dev/null || true
-    gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark' 2>/dev/null || true
-    gsettings set org.gnome.desktop.interface cursor-theme 'Adwaita' 2>/dev/null || true
-fi
-
-# Ensure GTK settings files exist
-mkdir -p "$XDG_CONFIG_HOME/gtk-3.0" "$XDG_CONFIG_HOME/gtk-4.0"
-for ver in 3.0 4.0; do
-    conf="$XDG_CONFIG_HOME/gtk-${ver}/settings.ini"
-    if [[ ! -f "$conf" ]]; then
-        cat > "$conf" <<'EOF'
-[Settings]
-gtk-theme-name=adw-gtk3-dark
-gtk-icon-theme-name=Papirus-Dark
-gtk-cursor-theme-name=Adwaita
-gtk-font-name=JetBrainsMono Nerd Font 11
-gtk-application-prefer-dark-theme=1
-EOF
-    fi
-done
+iface="org.gnome.desktop.interface"
+gsettings set "$iface" color-scheme 'prefer-dark'
+gsettings set "$iface" gtk-theme 'adw-gtk3-dark'
+gsettings set "$iface" icon-theme 'Papirus-Dark'
+gsettings set "$iface" cursor-theme 'Adwaita'
+gsettings set "$iface" cursor-size 24
+gsettings set "$iface" font-name 'JetBrainsMono Nerd Font 11'
+gsettings set "$iface" monospace-font-name 'JetBrainsMono Nerd Font 11'
