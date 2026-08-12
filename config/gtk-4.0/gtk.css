@@ -1,0 +1,31 @@
+/* ============================================================
+   GTK 4 / libadwaita — same accent as GTK 3 and the bar
+   ============================================================ */
+
+@import url("../theme/colors.css");
+
+@define-color accent_color @accent;
+@define-color accent_bg_color @accent;
+@define-color accent_fg_color @crust;
+
+@define-color window_bg_color @base;
+@define-color window_fg_color @text;
+@define-color view_bg_color @base;
+@define-color view_fg_color @text;
+@define-color headerbar_bg_color @mantle;
+@define-color headerbar_fg_color @text;
+@define-color popover_bg_color @surface;
+@define-color popover_fg_color @text;
+@define-color card_bg_color @surface;
+@define-color card_fg_color @text;
+@define-color dialog_bg_color @surface;
+@define-color dialog_fg_color @text;
+
+@define-color destructive_bg_color @red;
+@define-color destructive_fg_color @crust;
+@define-color success_bg_color @green;
+@define-color success_fg_color @crust;
+@define-color warning_bg_color @yellow;
+@define-color warning_fg_color @crust;
+@define-color error_bg_color @red;
+@define-color error_fg_color @crust;

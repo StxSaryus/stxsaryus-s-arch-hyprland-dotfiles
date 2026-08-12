@@ -1,0 +1,22 @@
+/* ============================================================
+   GTK 3 — pulls the rice accent into adw-gtk3-dark
+   ============================================================ */
+
+@import url("../theme/colors.css");
+
+@define-color theme_selected_bg_color @accent;
+@define-color theme_selected_fg_color @crust;
+@define-color accent_color @accent;
+@define-color accent_bg_color @accent;
+@define-color accent_fg_color @crust;
+
+/* Text cursor and selection follow the accent everywhere */
+entry {
+    caret-color: @accent;
+}
+
+selection,
+textview text selection {
+    background-color: @accent;
+    color: @crust;
+}

@@ -1,27 +1,27 @@
 {
   "$schema": "/etc/xdg/swaync/configSchema.json",
-  "positionX": "center",
+  "positionX": "right",
   "positionY": "top",
   "layer": "overlay",
   "control-center-layer": "top",
   "layer-shell": true,
   "cssPriority": "user",
-  "control-center-margin-top": 5,
-  "control-center-margin-bottom": 0,
-  "control-center-margin-right": 0,
+  "control-center-margin-top": 8,
+  "control-center-margin-bottom": 8,
+  "control-center-margin-right": 12,
   "control-center-margin-left": 0,
+  "control-center-width": 440,
+  "control-center-height": 700,
+  "notification-window-width": 400,
+  "notification-icon-size": 32,
+  "notification-body-image-height": 120,
+  "notification-body-image-width": 200,
   "notification-2fa-action": true,
   "notification-inline-replies": false,
-  "notification-icon-size": 24,
-  "notification-body-image-height": 100,
-  "notification-body-image-width": 100,
-  "notification-window-width": 300,
   "timeout": 6,
   "timeout-low": 3,
   "timeout-critical": 0,
   "fit-to-screen": false,
-  "control-center-width": 450,
-  "control-center-height": 720,
   "keyboard-shortcuts": true,
   "image-visibility": "when-available",
   "transition-time": 200,
@@ -29,60 +29,65 @@
   "hide-on-action": true,
   "script-fail-notify": true,
   "widgets": [
-      "dnd",
-      "buttons-grid",
-      "mpris",
-      "volume",
-      "backlight",
-      "title",
-      "notifications"
+    "title",
+    "dnd",
+    "buttons-grid",
+    "mpris",
+    "volume",
+    "backlight",
+    "notifications"
   ],
   "widget-config": {
-      "title": {
-          "text": "Notifications",
-          "clear-all-button": true,
-          "button-text": "Clear"
-      },
-      "dnd": {
-          "text": "Do Not Disturb"
-      },
-      "label": {
-          "max-lines": 1,
-          "text": "Notification"
-      },
-      "mpris": {
-          "image-size": 10,
-          "image-radius": 0
-      },
-      "volume": {
-          "label": "󰕾"
-      },
-      "backlight": {
-          "label": "󰃟"
-      },
-      "buttons-grid": {
-          "actions": [
-              {
-                  "label": "󰐥",
-                  "command": "sh -lc 'nwg-bar -f -p center -s style.css -t bar.json'"
-              },
-              {
-                  "label": "󰌾",
-                  "command": "hyprlock"
-              },
-              {
-                  "label": "󰍃",
-                  "command": "hyprctl dispatch exit"
-              },
-              {
-                  "label": "󰝟",
-                  "command": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
-              },
-              {
-                  "label": "󰂯",
-                  "command": "blueman-manager"
-              }
-          ]
-      }
+    "title": {
+      "text": "Notifications",
+      "clear-all-button": true,
+      "button-text": "Clear all"
+    },
+    "dnd": {
+      "text": "Do not disturb"
+    },
+    "label": {
+      "max-lines": 1,
+      "text": "Notification"
+    },
+    "mpris": {
+      "image-size": 60,
+      "image-radius": 8
+    },
+    "volume": {
+      "label": "󰕾",
+      "show-per-app": true
+    },
+    "backlight": {
+      "label": "󰃟"
+    },
+    "buttons-grid": {
+      "actions": [
+        {
+          "label": "󰐥",
+          "command": "nwg-bar -f -p center"
+        },
+        {
+          "label": "󰌾",
+          "command": "hyprlock"
+        },
+        {
+          "label": "󰍃",
+          "command": "hyprctl dispatch exit"
+        },
+        {
+          "label": "󰝟",
+          "command": "pamixer -t"
+        },
+        {
+          "label": "󰂯",
+          "command": "blueman-manager"
+        },
+        {
+          "label": "󰸉",
+          "command": "waypaper"
+        }
+      ]
+    }
   }
 }

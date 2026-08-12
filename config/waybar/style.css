@@ -1,224 +1,273 @@
+/* ============================================================
+   Waybar — Nocturne
+   Colours come from ../theme/colors.css (generated from palette.conf).
+   Radius scale: 8px pills · 12px cards · 16px bar.
+   ============================================================ */
+
+@import url("../theme/colors.css");
+
 * {
     border: none;
     border-radius: 0;
-    font-family: "JetBrainsMono Nerd Font", "Font Awesome 7 Free Solid", monospace;
+    font-family: "JetBrainsMono Nerd Font", "Font Awesome 6 Free Solid", monospace;
     font-size: 13px;
     min-height: 0;
 }
 
 window#waybar {
-    background: rgba(15, 15, 20, 0.75);
-    color: #ffffff;
-    border-radius: 14px;
-    transition: all 0.4s ease;
+    background: @bar_bg;
+    color: @text;
+    border-radius: 16px;
+    transition: background 300ms ease;
 }
 
-/* ── Module groups (single bar, no background) ───── */
+window#waybar.hidden {
+    opacity: 0;
+}
+
 .modules-left,
 .modules-center,
 .modules-right {
     background: transparent;
-    padding: 0 4px;
+    padding: 0 6px;
     margin: 0;
 }
 
-/* ── Generic module styling ───────────────────────── */
+/* ── Shared pill geometry ─────────────────────────────────── */
 #workspaces button,
 #clock,
 #battery,
+#backlight,
 #network,
 #pulseaudio,
 #bluetooth,
 #mpris,
 #custom-arch,
+#custom-lock,
 #custom-sys_combined,
-#custom-gpu,
+#custom-notification,
 #custom-power,
 #custom-waypaper,
 #custom-updates,
 #window {
-    padding: 0 8px;
-    color: rgba(255, 255, 255, 0.85);
+    padding: 0 9px;
+    margin: 4px 1px;
+    color: @subtext;
     background: transparent;
-    transition: all 0.2s ease;
+    border-radius: 8px;
+    transition: background 160ms ease, color 160ms ease;
 }
 
-/* ── Hover effect ─────────────────────────────────── */
 #clock:hover,
 #battery:hover,
+#backlight:hover,
 #network:hover,
 #pulseaudio:hover,
 #bluetooth:hover,
 #custom-arch:hover,
+#custom-lock:hover,
 #custom-sys_combined:hover,
-#custom-gpu:hover,
-#custom-power:hover,
+#custom-notification:hover,
 #custom-waypaper:hover,
 #custom-updates:hover,
 #mpris:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    color: @text;
+    background: @hover_bg;
 }
 
-/* ── Lock icon ────────────────────────────────────── */
+/* ── Pin toggle (far left) ────────────────────────────────── */
 #custom-lock {
-    font-size: 15px;
-    padding: 0 14px 0 12px;
-    color: rgba(255, 255, 255, 0.5);
-    min-width: 20px;
+    font-size: 14px;
+    color: @faint;
+    padding: 0 10px;
+    margin-left: 2px;
 }
 
-#custom-lock:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
+#custom-lock.pinned {
+    color: @accent;
 }
 
-/* ── Arch logo ────────────────────────────────────── */
+/* ── Arch logo — the identity mark ────────────────────────── */
 #custom-arch {
     font-size: 16px;
-    color: #ffffff;
-    padding: 0 12px 0 8px;
+    color: @accent;
+    padding: 0 10px;
 }
 
-/* ── Workspaces ───────────────────────────────────── */
+#custom-arch:hover {
+    background: @accent_soft;
+    color: @accent;
+}
+
+/* ── Workspaces ───────────────────────────────────────────── */
 #workspaces {
     padding: 0 2px;
 }
 
 #workspaces button {
-    padding: 0 7px;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 13px;
+    padding: 0 8px;
+    color: @faint;
+    min-width: 14px;
 }
 
 #workspaces button:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.85);
+    background: @hover_bg;
+    color: @subtext;
 }
 
-#workspaces button.active {
-    color: #ffffff;
-    font-weight: bold;
+/* Hyprland's module marks the current workspace "active"; sway's marks it
+   "focused". Styling both keeps the bar correct either way. */
+#workspaces button.active,
+#workspaces button.focused {
+    color: @accent;
+    background: @accent_soft;
 }
 
 #workspaces button.urgent {
-    color: #ff6b6b;
+    color: @red;
+    background: @red_soft;
 }
 
-/* ── Window title ─────────────────────────────────── */
+/* ── Window title ─────────────────────────────────────────── */
 #window {
-    color: rgba(255, 255, 255, 0.35);
+    color: @muted;
     font-size: 12px;
-    padding: 0 6px;
 }
 
-/* ── Media player (left, slightly highlighted) ────── */
-#group-mpris {
-    background: rgba(255, 255, 255, 0.07);
-    border-radius: 8px;
-    padding: 0 8px;
-    margin: 5px 2px 5px 4px;
+window#waybar.empty #window {
+    background: transparent;
+    padding: 0;
+    margin: 0;
 }
 
-#group-mpris:hover {
-    background: rgba(255, 255, 255, 0.13);
+/* ── Cards: grouped modules sit on a raised surface ─────────
+   Class comes from the "#card" suffix on the group name.        */
+.card {
+    background: @card_bg;
+    border-radius: 12px;
+    margin: 4px 3px;
+    padding: 0 2px;
+    transition: background 160ms ease;
+}
+
+.card:hover {
+    background: @hover_bg;
 }
 
 #mpris {
-    color: rgba(255, 255, 255, 0.9);
+    color: @subtext;
     font-size: 12px;
-    padding: 0 4px;
+    margin: 0;
+}
+
+#mpris.playing {
+    color: @green;
 }
 
 #mpris.paused {
-    color: rgba(255, 255, 255, 0.35);
+    color: @muted;
 }
 
-/* ── Clock ────────────────────────────────────────── */
+#custom-sys_combined {
+    color: @subtext;
+    margin: 0;
+}
+
+/* ── Clock — the anchor of the right side ─────────────────── */
 #clock {
+    color: @text;
     font-weight: 600;
-    color: #ffffff;
-    padding: 0 10px;
+    padding: 0 11px;
 }
 
-/* ── Battery ──────────────────────────────────────── */
-#battery.good {
-    color: rgba(255, 255, 255, 0.85);
-}
-
-#battery.warning {
-    color: #ffd93d;
-}
-
-#battery.critical {
-    color: #ff6b6b;
-    animation: blink 1s linear infinite alternate;
-}
-
+/* ── Battery ──────────────────────────────────────────────── */
 #battery.charging {
-    color: #6bcb77;
+    color: @green;
+}
+
+#battery.warning:not(.charging) {
+    color: @yellow;
+}
+
+#battery.critical:not(.charging) {
+    color: @red;
+    background: @red_soft;
+    animation: blink 1.2s linear infinite alternate;
 }
 
 @keyframes blink {
     from { opacity: 1; }
-    to   { opacity: 0.4; }
+    to   { opacity: 0.45; }
 }
 
-/* ── Network ──────────────────────────────────────── */
-#network.disconnected {
-    color: rgba(255, 255, 255, 0.3);
-}
-
-/* ── Bluetooth ────────────────────────────────────── */
-#bluetooth.connected {
-    color: #74b9ff;
-}
-
-#bluetooth.off {
-    color: rgba(255, 255, 255, 0.25);
-}
-
-/* ── Audio ────────────────────────────────────────── */
+/* ── Connectivity ─────────────────────────────────────────── */
+#network.disconnected,
+#bluetooth.off,
+#bluetooth.disabled,
 #pulseaudio.muted {
-    color: rgba(255, 255, 255, 0.3);
+    color: @faint;
 }
 
-/* ── Stats group ──────────────────────────────────── */
-#group-stats {
-    background: rgba(255, 255, 255, 0.07);
-    border-radius: 8px;
-    padding: 0 6px;
-    margin: 5px 2px;
+#bluetooth.connected {
+    color: @blue;
 }
 
-#group-stats:hover {
-    background: rgba(255, 255, 255, 0.13);
+/* ── Updates ──────────────────────────────────────────────── */
+#custom-updates {
+    color: @peach;
 }
 
-/* ── GPU ──────────────────────────────────────────── */
-#custom-gpu {
-    color: rgba(255, 255, 255, 0.75);
+#custom-updates.empty {
+    color: @faint;
 }
 
-/* ── Waypaper ─────────────────────────────────────── */
+/* ── Notifications ────────────────────────────────────────── */
+#custom-notification {
+    font-size: 14px;
+    color: @muted;
+    padding: 0 10px;
+}
+
+#custom-notification.notification {
+    color: @accent;
+}
+
+#custom-notification.dnd-none,
+#custom-notification.dnd-notification {
+    color: @faint;
+}
+
+/* ── Wallpaper picker ─────────────────────────────────────── */
 #custom-waypaper {
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.6);
-    padding: 0 8px;
+    color: @muted;
 }
 
-/* ── Power button ─────────────────────────────────── */
+#custom-waypaper:hover {
+    color: @mauve;
+}
+
+/* ── Power ────────────────────────────────────────────────── */
 #custom-power {
     font-size: 15px;
-    padding: 0 8px 0 10px;
-    color: rgba(255, 255, 255, 0.6);
+    color: @muted;
+    padding: 0 11px;
+    margin-right: 2px;
 }
 
 #custom-power:hover {
-    color: #ff6b6b;
-    background: rgba(255, 107, 107, 0.12);
-    border-radius: 8px;
+    color: @red;
+    background: @red_soft;
+}
+
+/* ── Tooltips follow the same language ────────────────────── */
+tooltip {
+    background: @popup_bg;
+    border: 1px solid @hairline;
+    border-radius: 12px;
+}
+
+tooltip label {
+    color: @subtext;
+    padding: 2px;
 }

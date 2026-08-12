@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# waypaper post_command: seçilen wallpaper'ı hyprpaper.conf'a yaz
+# Runs as waypaper's post_command: writes the wallpaper you just picked into
+# hyprpaper.conf, so it is already on screen the next time you log in.
+set -uo pipefail
 
-WP=$(grep "^wallpaper" ~/.config/waypaper/config.ini | cut -d'=' -f2 | xargs)
-[ -z "$WP" ] && exit 0
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}"
+WP="$(sed -n 's/^wallpaper[[:space:]]*=[[:space:]]*//p' "$CONF/waypaper/config.ini" 2>/dev/null | head -1)"
+[[ -z "$WP" ]] && exit 0
 
 WP="${WP/#\~/$HOME}"
+[[ -f "$WP" ]] || exit 0
 
-cat > ~/.config/hypr/hyprpaper.conf << EOF
+cat >"$CONF/hypr/hyprpaper.conf" <<EOF
 preload = ${WP}
 wallpaper = ,contain:${WP}
 splash = false
