@@ -1,0 +1,76 @@
+/* ============================================================
+   Waypaper — matches the launcher and notification centre
+   ============================================================ */
+
+@import url("../theme/colors.css");
+
+window,
+box,
+scrolledwindow,
+viewport,
+flowbox {
+    background-color: @base;
+    color: @text;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 13px;
+}
+
+headerbar {
+    background: @mantle;
+    border-bottom: 1px solid @hairline;
+    color: @text;
+    min-height: 44px;
+}
+
+button {
+    background: @surface;
+    color: @subtext;
+    border: 1px solid @hairline;
+    border-radius: 8px;
+    padding: 4px 10px;
+}
+
+button:hover {
+    background: @hover_bg;
+    color: @text;
+}
+
+button:active,
+button:checked {
+    background: @accent_soft;
+    color: @accent;
+    border-color: @accent;
+}
+
+flowboxchild {
+    background: transparent;
+    border-radius: 12px;
+    padding: 4px;
+}
+
+flowboxchild:selected,
+flowboxchild:hover {
+    background: @accent_soft;
+}
+
+label {
+    color: @subtext;
+}
+
+entry {
+    background: @surface;
+    color: @text;
+    border: 1px solid @hairline;
+    border-radius: 8px;
+    caret-color: @accent;
+}
+
+scrollbar slider {
+    background: @overlay;
+    border-radius: 8px;
+    min-width: 8px;
+}
+
+scrollbar slider:hover {
+    background: @line;
+}

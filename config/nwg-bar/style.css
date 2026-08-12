@@ -1,0 +1,49 @@
+/* ============================================================
+   nwg-bar — session menu, styled like the notification centre
+   ============================================================ */
+
+@import url("../theme/colors.css");
+
+window {
+    background-color: @dim_bg;
+}
+
+#outer-box {
+    background: transparent;
+    padding: 20px;
+}
+
+#inner-box {
+    background: @popup_bg;
+    border: 1px solid @hairline;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 12px 36px @shadow;
+}
+
+button,
+image {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+button {
+    color: @subtext;
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    font-size: 13px;
+    padding: 14px 10px 10px 10px;
+    margin: 4px;
+    border-radius: 12px;
+    transition: background 160ms ease, color 160ms ease;
+}
+
+button:hover {
+    background: @accent_soft;
+    color: @accent;
+}
+
+button:focus {
+    background: @hover_bg;
+    color: @text;
+}
