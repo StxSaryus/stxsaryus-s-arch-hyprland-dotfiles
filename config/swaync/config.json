@@ -65,7 +65,7 @@
       "actions": [
         {
           "label": "󰐥",
-          "command": "nwg-bar -f -p center"
+          "command": "~/.local/share/bin/session-menu.sh"
         },
         {
           "label": "󰌾",

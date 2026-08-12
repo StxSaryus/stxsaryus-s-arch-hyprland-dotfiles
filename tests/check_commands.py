@@ -65,7 +65,7 @@ BASE = {
 }
 
 # Provided by the repo itself rather than a package.
-OWN_SCRIPTS = {"waypaper-toggle.sh", "launcher-toggle.sh", "systemupdate.sh",
+OWN_SCRIPTS = {"waypaper-toggle.sh", "session-menu.sh", "launcher-toggle.sh", "systemupdate.sh",
                "lock-icon.sh", "lock-toggle.sh", "sys_stats.sh", "osd.sh",
                "waybar-autohide.sh", "wallpaper-sync.sh", "apply-dark-theme.sh"}
 

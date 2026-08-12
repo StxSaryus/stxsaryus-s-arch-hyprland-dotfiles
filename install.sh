@@ -247,8 +247,19 @@ install_aur_packages() {
     ensure_yay
     local aur=(oh-my-zsh-git zsh-theme-powerlevel10k-git)
     [[ "$OPT_WAYPAPER" -eq 1 ]] && aur+=(waypaper-git)
-    yay -S --needed --noconfirm "${aur[@]}"
-    success "AUR packages installed"
+
+    # One AUR package failing to build must not take the whole install with
+    # it — the configs still need to be linked. Report and carry on.
+    local pkg failed=()
+    for pkg in "${aur[@]}"; do
+        yay -S --needed --noconfirm "$pkg" || failed+=("$pkg")
+    done
+    if (( ${#failed[@]} )); then
+        warn "AUR packages that did not install: ${failed[*]}"
+        warn "Install them later with: yay -S ${failed[*]}"
+    else
+        success "AUR packages installed"
+    fi
 }
 
 setup_nvidia() {
@@ -331,7 +342,7 @@ copy_if_missing() {
     cp "$src" "$dest"
 }
 
-# Symlinks created by older versions of this repo
+# Leftovers from older versions of this repo
 clean_stale_links() {
     local stale=(
         "$HOME/.config/hypr/brightness-osd.sh"
@@ -341,6 +352,15 @@ clean_stale_links() {
     for f in "${stale[@]}"; do
         [[ -L "$f" ]] && rm -f "$f" && info "Removed stale link: ${f/#$HOME/\~}"
     done
+
+    # waypaper/config.ini is never overwritten, so a copy made by an earlier
+    # version still carries "stylesheet = ~/...". Waypaper is the one path
+    # option it does not expand ~ for, and it drops the theme without a word.
+    local wp="$HOME/.config/waypaper/config.ini"
+    if [[ -f "$wp" && ! -L "$wp" ]] && grep -q '^stylesheet[[:space:]]*=[[:space:]]*~' "$wp"; then
+        sed -i '/^stylesheet[[:space:]]*=[[:space:]]*~/d;/^keybindings[[:space:]]*=[[:space:]]*~/d' "$wp"
+        info "Removed the unexpandable stylesheet path from waypaper/config.ini"
+    fi
     return 0
 }
 
@@ -432,7 +452,7 @@ link_configs() {
     copy_if_missing "$REPO/config/waypaper/config.ini" "$HOME/.config/waypaper/config.ini"
 
     mkdir -p "$HOME/.local/share/bin"
-    for f in launcher-toggle.sh waypaper-toggle.sh systemupdate.sh; do
+    for f in launcher-toggle.sh waypaper-toggle.sh session-menu.sh systemupdate.sh; do
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/share/bin/$f"
     done
 
