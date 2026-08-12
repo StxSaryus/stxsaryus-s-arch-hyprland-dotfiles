@@ -5,9 +5,9 @@
 #   ./build-theme.sh          regenerate the colour files
 #   ./build-theme.sh --check  fail if the committed files are out of date
 #
+# shellcheck source-path=SCRIPTDIR
 set -euo pipefail
 
-# shellcheck source-path=SCRIPTDIR
 THEME_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PALETTE="$THEME_DIR/palette.conf"
 CHECK=0

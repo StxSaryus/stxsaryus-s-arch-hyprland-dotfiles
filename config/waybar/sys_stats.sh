@@ -97,11 +97,11 @@ fi
 
 # --- Render --------------------------------------------------------------
 if [[ "$mode" == "temp" ]]; then
-    text="󰻠 ${cpu_temp:-–}°"
+    text="󰘚 ${cpu_temp:-–}°"
     [[ -n "$gpu_util" ]] && text+="  󰢮 ${gpu_temp:-–}°"
     text+="  󰍛 ${mem_gib}G"
 else
-    text="󰻠 ${cpu_perc}%"
+    text="󰘚 ${cpu_perc}%"
     [[ -n "$gpu_util" ]] && text+="  󰢮 ${gpu_util}%"
     text+="  󰍛 ${mem_perc}%"
 fi

@@ -61,6 +61,31 @@ def load(rel: str):
     return json.loads(text)
 
 
+ICON_KEYS = ("format", "label", "icon", "text")
+
+
+def check_no_empty_icons(node, path: str) -> int:
+    """An icon that silently turns into an empty string hides its module.
+
+    Nerd Font glyphs are easy to lose in an editor or a copy-paste, and the
+    only symptom is a module quietly missing from the bar.
+    """
+    failures = 0
+    if isinstance(node, dict):
+        for key, value in node.items():
+            failures += check_no_empty_icons(value, f"{path}.{key}")
+            if isinstance(value, str) and not value.strip() and key.startswith(ICON_KEYS):
+                print(f"  FAIL {path}.{key} is empty — a lost icon hides the module")
+                failures += 1
+    elif isinstance(node, list):
+        for index, value in enumerate(node):
+            if isinstance(value, str) and not value.strip():
+                print(f"  FAIL {path}[{index}] is an empty icon")
+                failures += 1
+            failures += check_no_empty_icons(value, f"{path}[{index}]")
+    return failures
+
+
 def check_waybar(config: dict) -> int:
     failures = 0
     listed = []
@@ -97,6 +122,7 @@ def main() -> int:
             failures += 1
             continue
         print(f"  ok   {rel} parses")
+        failures += check_no_empty_icons(data, pathlib.Path(rel).stem)
         if rel.endswith("config.jsonc"):
             failures += check_waybar(data)
 

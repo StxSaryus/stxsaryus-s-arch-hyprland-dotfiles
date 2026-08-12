@@ -115,7 +115,10 @@ window#waybar.hidden {
     color: @subtext;
 }
 
-#workspaces button.active {
+/* Hyprland's module marks the current workspace "active"; sway's marks it
+   "focused". Styling both keeps the bar correct either way. */
+#workspaces button.active,
+#workspaces button.focused {
     color: @accent;
     background: @accent_soft;
 }
@@ -137,9 +140,9 @@ window#waybar.empty #window {
     margin: 0;
 }
 
-/* ── Cards: grouped modules sit on a raised surface ───────── */
-#group-player,
-#group-system {
+/* ── Cards: grouped modules sit on a raised surface ─────────
+   Class comes from the "#card" suffix on the group name.        */
+.card {
     background: @card_bg;
     border-radius: 12px;
     margin: 4px 3px;
@@ -147,8 +150,7 @@ window#waybar.empty #window {
     transition: background 160ms ease;
 }
 
-#group-player:hover,
-#group-system:hover {
+.card:hover {
     background: @hover_bg;
 }
 

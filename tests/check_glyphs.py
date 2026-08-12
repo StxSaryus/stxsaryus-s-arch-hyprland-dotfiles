@@ -36,9 +36,18 @@ PUA_RANGES = [
     (0x100000, 0x10FFFD),
 ]
 
+# This rice draws its icons from one family — the Material Design set — so
+# stroke weight and optical size match wherever an icon appears. Font
+# Awesome and friends live in the BMP private use area; ours do not.
+MDI_RANGE = (0xF0001, 0xF1AF0)
+
 
 def is_icon(cp: int) -> bool:
     return any(lo <= cp <= hi for lo, hi in PUA_RANGES)
+
+
+def is_material(cp: int) -> bool:
+    return MDI_RANGE[0] <= cp <= MDI_RANGE[1]
 
 
 def font_path() -> str | None:
@@ -72,13 +81,19 @@ def main() -> int:
                 if is_icon(cp):
                     used.setdefault(cp, []).append(f"{rel}:{lineno}")
 
-    missing = {cp: places for cp, places in used.items() if cp not in covered}
     print(f"  {len(used)} icon glyphs used, font covers {len(covered)} codepoints")
-    if missing:
-        for cp, places in sorted(missing.items()):
-            print(f"  FAIL U+{cp:04X} not in the font — {places[0]}")
+
+    failed = False
+    for cp, places in sorted(used.items()):
+        if cp not in covered:
+            print(f"  FAIL U+{cp:04X} is not in the font — {places[0]}")
+            failed = True
+        elif not is_material(cp):
+            print(f"  FAIL U+{cp:04X} is not a Material Design icon — {places[0]}")
+            failed = True
+    if failed:
         return 1
-    print(f"  ok   every icon resolves in {pathlib.Path(path).name}")
+    print(f"  ok   every icon is Material Design and resolves in {pathlib.Path(path).name}")
     return 0
 
 

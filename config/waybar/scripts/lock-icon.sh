@@ -7,7 +7,7 @@ state=""
 [[ -r "$PINNED_FILE" ]] && read -r state <"$PINNED_FILE" 2>/dev/null
 
 if [[ "$state" == "1" ]]; then
-    printf '{"text":"","class":"pinned","tooltip":"Bar pinned — click to auto-hide"}\n'
+    printf '{"text":"󰌾","class":"pinned","tooltip":"Bar pinned — click to auto-hide"}\n'
 else
-    printf '{"text":"","class":"unpinned","tooltip":"Bar auto-hides — click to pin"}\n'
+    printf '{"text":"󰿆","class":"unpinned","tooltip":"Bar auto-hides — click to pin"}\n'
 fi

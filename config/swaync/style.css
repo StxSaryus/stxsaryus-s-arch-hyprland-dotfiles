@@ -11,6 +11,21 @@
     font-weight: normal;
 }
 
+/* Draw every control ourselves. Without this the ambient GTK theme supplies
+   button frames and switch colours, and the panel ends up half light,
+   half dark on any system where adw-gtk3-dark is missing. */
+button,
+switch,
+scale trough,
+scale highlight,
+scale slider {
+    border: none;
+    box-shadow: none;
+    background-image: none;
+    text-shadow: none;
+    min-height: 0;
+}
+
 /* ── Toast notifications ──────────────────────────────────── */
 .floating-notifications {
     background: transparent;
@@ -206,19 +221,25 @@
 
 .widget-dnd > switch {
     background: @overlay;
-    border: 1px solid @hairline;
     border-radius: 14px;
-    box-shadow: none;
+    min-width: 46px;
+    min-height: 24px;
 }
 
 .widget-dnd > switch:checked {
     background: @accent;
-    border-color: @accent;
 }
 
 .widget-dnd > switch slider {
-    background: @text;
+    background: @subtext;
     border-radius: 12px;
+    min-width: 18px;
+    min-height: 18px;
+    margin: 3px;
+}
+
+.widget-dnd > switch:checked slider {
+    background: @crust;
 }
 
 .widget-label > label {
@@ -297,6 +318,7 @@
 .widget-backlight highlight {
     background: @accent;
     border-radius: 8px;
+    min-height: 6px;
 }
 
 .widget-volume slider,
@@ -305,6 +327,7 @@
     border-radius: 8px;
     min-width: 14px;
     min-height: 14px;
+    margin: -5px;
 }
 
 .widget-volume > box > button {

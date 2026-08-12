@@ -16,11 +16,11 @@
         "custom/arch",
         "hyprland/workspaces",
         "hyprland/window",
-        "group/player"
+        "group/player#card"
     ],
     "modules-center": [],
     "modules-right": [
-        "group/system",
+        "group/system#card",
         "pulseaudio",
         "backlight",
         "battery",
@@ -33,13 +33,16 @@
         "custom/power"
     ],
 
-    // ── Grouped modules (rendered as raised cards) ───────────
-    "group/player": {
+    // ── Grouped modules ──────────────────────────────────────
+    // The "#card" suffix adds a CSS class of that name. Targeting the class
+    // rather than the widget id keeps the styling working no matter how a
+    // given Waybar version derives a group's id.
+    "group/player#card": {
         "orientation": "horizontal",
         "modules": ["mpris"]
     },
 
-    "group/system": {
+    "group/system#card": {
         "orientation": "horizontal",
         "modules": ["custom/sys_combined"]
     },
@@ -56,7 +59,7 @@
     },
 
     "custom/arch": {
-        "format": "",
+        "format": "󰣇",
         "tooltip-format": "Left click: app launcher\nRight click: wallpaper picker",
         "on-click": "~/.local/share/bin/launcher-toggle.sh",
         "on-click-right": "waypaper"
@@ -81,13 +84,13 @@
         "format": "{player_icon} {title}",
         "format-paused": "{status_icon} {title}",
         "player-icons": {
-            "default": "󰝚",
-            "spotify": "",
+            "default": "󰐊",
+            "spotify": "󰓇",
             "firefox": "󰈹",
-            "chromium": ""
+            "chromium": "󰊯"
         },
         "status-icons": {
-            "paused": ""
+            "paused": "󰏤"
         },
         "max-length": 38,
         "tooltip-format": "{player}: {artist} — {title}",

@@ -8,7 +8,7 @@
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT"
+cd "$ROOT" || exit 1
 
 GREEN='\033[0;32m'; RED='\033[0;31m'; YELLOW='\033[1;33m'; BOLD='\033[1m'; NC='\033[0m'
 PASS=0
@@ -29,7 +29,10 @@ run() {
 }
 
 scripts() {
-    git ls-files '*.sh' 2>/dev/null || find . -name '*.sh' -not -path './.git/*'
+    # Tracked and not-yet-committed alike, so a new script is checked before
+    # it lands rather than after.
+    git ls-files --cached --others --exclude-standard '*.sh' 2>/dev/null \
+        || find . -name '*.sh' -not -path './.git/*'
 }
 
 # ── 1. Shell syntax ──────────────────────────────────────────
