@@ -58,6 +58,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │   ├── hypr/
 │   │   ├── hyprland.conf            # Main Hyprland config (NVIDIA tuned)
 │   │   ├── hyprpaper.conf           # Wallpaper preload (instant boot wallpaper)
+│   │   ├── hyprlock.conf            # Screen locker (blur background, PAM auth)
 │   │   ├── waybar-autohide.sh       # Win11-style auto show/hide logic
 │   │   ├── brightness-osd.sh        # Brightness change notifications
 │   │   └── wallpaper-sync.sh        # Syncs waypaper choice to hyprpaper.conf

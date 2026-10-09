@@ -1,5 +1,5 @@
 #!/bin/bash
-STATE_FILE="/tmp/waybar_stats_state"
+STATE_FILE="${XDG_RUNTIME_DIR:-/tmp}/waybar_stats_state"
 [ ! -f "$STATE_FILE" ] && echo "perc" > "$STATE_FILE"
 
 if [[ "$1" == "toggle" ]]; then

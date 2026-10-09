@@ -347,7 +347,7 @@ link_configs() {
         warn "Moved hyprland.lua aside (Hyprland 0.55+ prefers .lua over .conf)"
     fi
     local f
-    for f in waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh hyprpaper.conf apply-dark-theme.sh; do
+    for f in waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh hyprpaper.conf apply-dark-theme.sh hyprlock.conf; do
         backup_and_link "$REPO/config/hypr/$f" "$HOME/.config/hypr/$f"
     done
 
