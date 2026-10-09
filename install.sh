@@ -386,9 +386,10 @@ link_configs() {
             [[ -f "$f" ]] && backup_and_link "$f" "$HOME/.local/share/color-schemes/$(basename "$f")"
         done
     fi
-    mkdir -p "$HOME/.local/share/bin"
-    for f in launcher-toggle.sh systemupdate.sh waypaper-toggle.sh setup-file-share.sh bt-headset.sh fix-localsend.sh; do
+    mkdir -p "$HOME/.local/share/bin" "$HOME/.local/bin"
+    for f in launcher-toggle.sh systemupdate.sh waypaper-toggle.sh setup-file-share.sh bt-headset.sh fix-localsend.sh gpu-power-menu.sh prime-run; do
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/share/bin/$f"
+        backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/bin/$f"
     done
     backup_and_link "$REPO/zsh/.zshrc" "$HOME/.zshrc"
     backup_and_link "$REPO/bash/.bashrc" "$HOME/.bashrc"

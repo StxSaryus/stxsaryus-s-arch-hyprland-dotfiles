@@ -137,7 +137,8 @@
             "󰂂",
             "󰁹"
         ],
-        "tooltip-format": "{timeTo} • {power:.1f}W"
+        "tooltip-format": "{timeTo} • {power:.1f}W",
+        "on-click": "~/.local/share/bin/gpu-power-menu.sh"
     },
     "clock": {
         "format": " {:%H:%M}",

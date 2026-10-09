@@ -26,6 +26,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 - **One-command installer** — `./install.sh` auto-installs packages, yay, fonts, configs, and the correct NVIDIA driver (Pascal → `nvidia-580xx-dkms` per Arch News); see [INSTALL.md](INSTALL.md)
 - **10 workspaces** — full keyboard + mouse scroll navigation
 - **Dark glass aesthetic** — translucent bar, rounded corners, minimal design
+- **Interactive GPU & Power Switcher** — click the Waybar battery icon to switch between Integrated (Intel), Hybrid, or Dedicated (NVIDIA) modes and launch games on GTX 1050 Ti
 
 ---
 
@@ -94,7 +95,9 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │       ├── waypaper-toggle.sh        # Waypaper toggle
 │       ├── setup-file-share.sh       # LocalSend & OBEX setup
 │       ├── fix-localsend.sh          # LocalSend firewall helper
-│       └── bt-headset.sh             # Bluetooth headset profile helper
+│       ├── bt-headset.sh             # Bluetooth headset profile helper
+│       ├── gpu-power-menu.sh         # Waybar battery click GPU/power profile menu
+│       └── prime-run                 # Dedicated NVIDIA GPU runner wrapper
 ├── zsh/
 │   └── .zshrc                        # Zsh + Oh-My-Zsh + Powerlevel10k
 ├── bash/
@@ -368,6 +371,21 @@ Click the lock icon on the far left of the bar. When locked, the bar stays visib
 
 ### Change default apps and shortcuts
 `./install.sh --interactive` or edit `~/.config/hypr/hyprland.conf`. See [INSTALL.md](INSTALL.md).
+
+### Gaming on Hybrid GPU (Steam & Standalone Games)
+On Intel + NVIDIA hybrid laptops, the Intel iGPU drives the desktop to keep battery life high. To run games (such as Rocket League) on the dedicated NVIDIA GTX 1050 Ti:
+
+1. **Via Waybar Battery Icon**: Click the battery icon on Waybar and select **Launch Rocket League (Dedicated NVIDIA GTX 1050 Ti)** or switch to **Performance Mode**.
+2. **Via Steam Launch Options**:
+   - Right click any game in Steam → **Properties** → **General** → **Launch Options**
+   - Enter:
+     ```bash
+     prime-run %command%
+     ```
+3. **Via Terminal**:
+   ```bash
+   prime-run <command>
+   ```
 
 ---
 
