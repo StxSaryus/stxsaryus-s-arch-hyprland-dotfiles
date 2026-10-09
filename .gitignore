@@ -1,25 +1,87 @@
+# ============================================================
+# .gitignore — Sensitive Data, Backups, Caches & Editor Artifacts
+# ============================================================
+
+# --- Secrets, Credentials & Keys ---
+*.env
+*.env.*
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*.secret
+*.secret.*
+*.token
+*.token.*
+*.credentials
+*credentials*.json
+*token*.json
+*auth*.json
+id_rsa*
+id_ed25519*
+id_ecdsa*
+id_dsa*
+authorized_keys*
+known_hosts*
+
+# --- Sensitive Application Configs & Tokens ---
+rclone.conf
+*session*
+*.cookie*
+*.cookies
+
+# --- History & Logs ---
+*.log
+*history*
+.bash_history
+.zsh_history
+.lesshst
+.node_repl_history
+.python_history
+
+# --- Hyprland Crash Reports & Sockets ---
+hyprlandCrashReport*.log
+*.sock
+core
+core.*
+
+# --- Network & VPN Credentials ---
+*.ovpn
+*.wireguard
+system-connections/
+
+# --- Backups, Temporary & Swap Files ---
 *.bak
 *.bak.*
-*.swp
+*.old
 *.tmp
 *.orig
 *.rej
 *~
+*.swp
+*.swo
+*.swn
+
+# --- OS & Desktop Caches ---
 .DS_Store
 Thumbs.db
 .directory
+.cache/
+*.cache
 
-# Editor / IDE
+# --- Editor / IDE ---
 .idea/
 .vscode/
 *.sublime-*
+*.code-workspace
 
-# Local overrides (optional per-machine configs)
-*.local
-*.local.*
-
-# Python (if any tooling is added later)
+# --- Python ---
 __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# --- Local Overrides (machine-specific) ---
+*.local
+*.local.*

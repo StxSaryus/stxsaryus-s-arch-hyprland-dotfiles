@@ -124,6 +124,21 @@ Hyprland stack, Waybar, SwayNC, PipeWire, Blueman, portals, fonts (`ttf-jetbrain
 
 Standalone NVIDIA script uses the same Arch News guidance as the main installer.
 
+### Steam on Pascal (GTX 10xx)
+
+Do **not** pick `lib32-nvidia-utils` (610) — it conflicts with `nvidia-580xx-utils` and would break your driver.
+
+```bash
+# 1) 32-bit NVIDIA libs for the 580xx branch (AUR)
+yay -S --needed lib32-nvidia-580xx-utils
+
+# 2) Steam (multilib) — when asked for lib32-vulkan-driver, pick nothing that pulls nvidia-utils 610.
+#    With lib32-nvidia-580xx-utils already installed, Steam should resolve.
+sudo pacman -S steam
+```
+
+If pacman still offers `lib32-nvidia-utils`, answer **N** to removing `nvidia-580xx-utils`, cancel, install `lib32-nvidia-580xx-utils` first, then retry Steam.
+
 ---
 
 ## Keyboard shortcuts (full)

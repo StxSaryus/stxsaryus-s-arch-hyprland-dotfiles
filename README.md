@@ -41,10 +41,11 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 | **Notification Center** | SwayNC |
 | **Wallpaper Manager** | Waypaper + Hyprpaper |
 | **Screen Lock** | Hyprlock |
-| **Power Menu** | nwg-bar |
-| **File Manager** | Thunar |
+| **Power Menu** | wlogout / nwg-bar |
+| **File Manager** | Dolphin / Thunar |
+| **File Sharing** | LocalSend + Bluetooth OBEX |
 | **Browser** | Firefox |
-| **Audio Server** | PipeWire |
+| **Audio Server** | PipeWire + WirePlumber |
 | **Bluetooth Manager** | Blueman |
 
 ---
@@ -77,9 +78,22 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │   │   └── style.css                 # Notification theme (dark glass)
 │   ├── waypaper/
 │   │   └── config.ini                # Wallpaper manager settings
+│   ├── wlogout/
+│   │   ├── layout                    # Power menu layout
+│   │   └── style.css                 # Power menu theme
+│   ├── wireplumber/
+│   │   └── wireplumber.conf.d/       # Audio & bluetooth autoswitch config
+│   ├── xdg-desktop-portal/
+│   │   └── portals.conf              # GTK & Hyprland portal preferences
+│   ├── environment.d/
+│   │   └── 90-dark-theme.conf        # System-wide dark mode environment
 │   └── local-bin/
 │       ├── launcher-toggle.sh        # Rofi toggle (Super+Space)
-│       └── systemupdate.sh           # Waybar update checker
+│       ├── systemupdate.sh           # Waybar update checker
+│       ├── waypaper-toggle.sh        # Waypaper toggle
+│       ├── setup-file-share.sh       # LocalSend & OBEX setup
+│       ├── fix-localsend.sh          # LocalSend firewall helper
+│       └── bt-headset.sh             # Bluetooth headset profile helper
 ├── zsh/
 │   └── .zshrc                        # Zsh + Oh-My-Zsh + Powerlevel10k
 ├── bash/
@@ -94,6 +108,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 ├── boot-speed/
 │   └── ...                           # mkinitcpio fast boot tweaks
 ├── install.sh                        # Fully automatic installer
+├── update.sh                         # System & dotfiles updater
 ├── INSTALL.md                        # Guide + official Arch/NVIDIA notices
 └── README.md
 ```

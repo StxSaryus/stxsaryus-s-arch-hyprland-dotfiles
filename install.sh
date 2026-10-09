@@ -33,7 +33,7 @@ SUDO_KEEPALIVE_PID=""
 
 TERMINAL_CMD="kitty"
 BROWSER_CMD="firefox"
-FILE_MANAGER_CMD="thunar"
+FILE_MANAGER_CMD="dolphin"
 LAUNCHER_CMD="~/.local/share/bin/launcher-toggle.sh"
 KEY_TERMINAL="T"
 KEY_BROWSER="B"
@@ -188,9 +188,9 @@ install_pacman_packages() {
     need_sudo
     local pkgs=(
         hyprland hyprlock hypridle hyprpaper hyprpicker hyprpolkitagent
-        waybar swaync nwg-bar brightnessctl
+        waybar swaync wlogout nwg-bar brightnessctl
         pipewire-pulse pipewire-alsa pipewire-jack pavucontrol pamixer playerctl
-        bluez bluez-utils blueman
+        bluez bluez-utils bluez-obex blueman localsend
         zsh zsh-completions
         xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk
         grim slurp swappy cliphist jq imagemagick
@@ -219,7 +219,7 @@ install_pacman_packages() {
         dolphin) pkgs+=(dolphin) ;;
         nemo) pkgs+=(nemo) ;;
         pcmanfm) pkgs+=(pcmanfm-gtk3) ;;
-        *) pkgs+=(thunar) ;;
+        *) pkgs+=(dolphin) ;;
     esac
     case "$LAUNCHER_CMD" in
         fuzzel) pkgs+=(fuzzel) ;;
@@ -331,7 +331,7 @@ patch_hyprland_conf() {
     launch_esc="${launch_esc//&/\\&}"
     sed -i "s/exec, kitty/exec, $term_esc/" "$HYPR_CONF"
     sed -i "s/exec, firefox/exec, $browser_esc/" "$HYPR_CONF"
-    sed -i "s/exec, thunar/exec, $fm_esc/" "$HYPR_CONF"
+    sed -i "s/exec, dolphin/exec, $fm_esc/" "$HYPR_CONF"
     sed -i "s|exec, ~/.local/share/bin/launcher-toggle.sh|exec, $launch_esc|" "$HYPR_CONF"
     sed -i "s/\$mainMod, T, exec,/\$mainMod, $KEY_TERMINAL, exec,/" "$HYPR_CONF"
     sed -i "s/\$mainMod, B, exec,/\$mainMod, $KEY_BROWSER, exec,/" "$HYPR_CONF"
@@ -354,7 +354,15 @@ link_configs() {
     mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
     backup_and_link "$REPO/config/gtk-3.0/settings.ini" "$HOME/.config/gtk-3.0/settings.ini"
     backup_and_link "$REPO/config/gtk-4.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"
+    backup_and_link "$REPO/config/gtk-4.0/gtk.css" "$HOME/.config/gtk-4.0/gtk.css"
     backup_and_link "$REPO/config/gtk-2.0/.gtkrc-2.0" "$HOME/.gtkrc-2.0"
+    backup_and_link "$REPO/config/kdeglobals" "$HOME/.config/kdeglobals"
+    mkdir -p "$HOME/.config/xdg-desktop-portal" "$HOME/.config/environment.d" \
+             "$HOME/.config/wireplumber/wireplumber.conf.d"
+    backup_and_link "$REPO/config/xdg-desktop-portal/portals.conf" "$HOME/.config/xdg-desktop-portal/portals.conf"
+    backup_and_link "$REPO/config/environment.d/90-dark-theme.conf" "$HOME/.config/environment.d/90-dark-theme.conf"
+    backup_and_link "$REPO/config/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf" \
+                    "$HOME/.config/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf"
     mkdir -p "$HOME/.config/waybar/scripts"
     for f in config.jsonc style.css sys_stats.sh gpu_stats.sh; do
         backup_and_link "$REPO/config/waybar/$f" "$HOME/.config/waybar/$f"
@@ -368,8 +376,18 @@ link_configs() {
         backup_and_link "$REPO/config/swaync/$f" "$HOME/.config/swaync/$f"
     done
     backup_and_link "$REPO/config/waypaper/config.ini" "$HOME/.config/waypaper/config.ini"
+    mkdir -p "$HOME/.config/wlogout"
+    for f in layout style.css; do
+        backup_and_link "$REPO/config/wlogout/$f" "$HOME/.config/wlogout/$f"
+    done
+    if [[ -d "$REPO/config/color-schemes" ]]; then
+        mkdir -p "$HOME/.local/share/color-schemes"
+        for f in "$REPO/config/color-schemes/"*; do
+            [[ -f "$f" ]] && backup_and_link "$f" "$HOME/.local/share/color-schemes/$(basename "$f")"
+        done
+    fi
     mkdir -p "$HOME/.local/share/bin"
-    for f in launcher-toggle.sh systemupdate.sh; do
+    for f in launcher-toggle.sh systemupdate.sh waypaper-toggle.sh setup-file-share.sh bt-headset.sh fix-localsend.sh; do
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/share/bin/$f"
     done
     backup_and_link "$REPO/zsh/.zshrc" "$HOME/.zshrc"
@@ -420,6 +438,24 @@ setup_greetd() {
     success "greetd enabled"
 }
 
+setup_file_share() {
+    section "LocalSend + Bluetooth receive"
+    need_sudo
+    sudo pacman -S --needed --noconfirm bluez-obex localsend
+    sudo systemctl enable --now bluetooth
+    systemctl --user enable --now obex 2>/dev/null || true
+    if systemctl is-active --quiet firewalld; then
+        sudo install -Dm644 "$REPO/config/firewalld/localsend.xml" /etc/firewalld/services/localsend.xml
+        sudo firewall-cmd --reload || true
+        sudo firewall-cmd --permanent --add-service=localsend || \
+            { sudo firewall-cmd --permanent --add-port=53317/tcp; sudo firewall-cmd --permanent --add-port=53317/udp; }
+        sudo firewall-cmd --reload || true
+        success "LocalSend ports opened in firewalld (53317)"
+    fi
+    mkdir -p "$HOME/Downloads"
+    success "OBEX + LocalSend ready"
+}
+
 prompt_interactive() {
     section "Application choices (Enter = default)"
     echo "Terminal: 1) Kitty  2) Alacritty  3) Foot  4) WezTerm"
@@ -428,9 +464,9 @@ prompt_interactive() {
     echo "Browser: 1) Firefox  2) Chromium  3) Brave  4) Librewolf"
     read -rp "Choice [1]: " c
     case "${c:-1}" in 2) BROWSER_CMD=chromium ;; 3) BROWSER_CMD=brave-browser ;; 4) BROWSER_CMD=librewolf ;; *) BROWSER_CMD=firefox ;; esac
-    echo "File manager: 1) Thunar  2) Nautilus  3) Dolphin  4) Nemo  5) PCManFM"
+    echo "File manager: 1) Dolphin  2) Nautilus  3) Thunar  4) Nemo  5) PCManFM"
     read -rp "Choice [1]: " c
-    case "${c:-1}" in 2) FILE_MANAGER_CMD=nautilus ;; 3) FILE_MANAGER_CMD=dolphin ;; 4) FILE_MANAGER_CMD=nemo ;; 5) FILE_MANAGER_CMD=pcmanfm ;; *) FILE_MANAGER_CMD=thunar ;; esac
+    case "${c:-1}" in 2) FILE_MANAGER_CMD=nautilus ;; 3) FILE_MANAGER_CMD=thunar ;; 4) FILE_MANAGER_CMD=nemo ;; 5) FILE_MANAGER_CMD=pcmanfm ;; *) FILE_MANAGER_CMD=dolphin ;; esac
     echo "Launcher: 1) Rofi  2) Fuzzel  3) Wofi"
     read -rp "Choice [1]: " c
     case "${c:-1}" in 2) LAUNCHER_CMD=fuzzel ;; 3) LAUNCHER_CMD="wofi --show drun" ;; *) LAUNCHER_CMD="~/.local/share/bin/launcher-toggle.sh" ;; esac
@@ -465,6 +501,7 @@ run_full_install() {
     install_aur_packages
     setup_nvidia
     setup_greetd
+    setup_file_share
     link_configs
     set_permissions
     setup_default_wallpaper

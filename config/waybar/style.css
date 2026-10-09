@@ -222,3 +222,15 @@ window#waybar {
     background: rgba(255, 107, 107, 0.12);
     border-radius: 8px;
 }
+
+#custom-power {
+    color: #cdd6f4;
+    padding: 0 12px;
+    margin: 4px 6px;
+    border-radius: 10px;
+}
+
+#custom-power:hover {
+    color: #89b4fa;
+    background: rgba(137, 180, 250, 0.15);
+}
