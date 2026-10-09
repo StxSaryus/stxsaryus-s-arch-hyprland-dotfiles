@@ -25,8 +25,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 - **Instant wallpaper** — hyprpaper loads your wallpaper at boot with zero delay
 - **One-command installer** — `./install.sh` auto-installs packages, yay, fonts, configs, and the correct NVIDIA driver (Pascal → `nvidia-580xx-dkms` per Arch News); see [INSTALL.md](INSTALL.md)
 - **10 workspaces** — full keyboard + mouse scroll navigation
-- **Dark glass aesthetic** — translucent bar, rounded corners, minimal design
-- **Interactive GPU & Power Switcher** — click the Waybar battery icon to switch between Integrated (Intel), Hybrid, or Dedicated (NVIDIA) modes and launch games on GTX 1050 Ti
+- **Interactive GPU & Power Switcher** — click the Waybar battery icon to switch between Integrated (Intel), Hybrid, or Performance (NVIDIA) modes and monitor live CPU, GPU, and battery stats
 
 ---
 
@@ -373,9 +372,9 @@ Click the lock icon on the far left of the bar. When locked, the bar stays visib
 `./install.sh --interactive` or edit `~/.config/hypr/hyprland.conf`. See [INSTALL.md](INSTALL.md).
 
 ### Gaming on Hybrid GPU (Steam & Standalone Games)
-On Intel + NVIDIA hybrid laptops, the Intel iGPU drives the desktop to keep battery life high. To run games (such as Rocket League) on the dedicated NVIDIA GTX 1050 Ti:
+On Intel + NVIDIA hybrid laptops, the Intel iGPU drives the desktop to maximize battery life. To run any game on the dedicated NVIDIA GTX 1050 Ti:
 
-1. **Via Waybar Battery Icon**: Click the battery icon on Waybar and select **Launch Rocket League (Dedicated NVIDIA GTX 1050 Ti)** or switch to **Performance Mode**.
+1. **Via Waybar Battery Icon**: Click the battery icon on Waybar and switch to **Performance Mode**.
 2. **Via Steam Launch Options**:
    - Right click any game in Steam → **Properties** → **General** → **Launch Options**
    - Enter:
