@@ -40,12 +40,14 @@ OPT_POWERSAVE="🔋 Integrated Mode (Power Saver - Intel Only)${PS_ACTIVE}"
 OPT_BALANCED="⚖️ Hybrid Mode (Balanced - Intel + NVIDIA On-Demand)${BAL_ACTIVE}"
 OPT_PERF="🚀 Performance Mode (Dedicated NVIDIA High-Power)${PERF_ACTIVE}"
 OPT_STATS="📊 Telemetry: CPU ${CPU_UTIL} | GPU ${GPU_UTIL} (${GPU_TEMP}) | Battery ${BAT_CAP}% (${BAT_STAT})"
+OPT_WIZARD="🔧 Hardware Wizard (Scan & Setup CPU / GPU Drivers)"
 
-MENU=$(printf "%s\n%s\n%s\n%s" \
+MENU=$(printf "%s\n%s\n%s\n%s\n%s" \
     "$OPT_POWERSAVE" \
     "$OPT_BALANCED" \
     "$OPT_PERF" \
-    "$OPT_STATS")
+    "$OPT_STATS" \
+    "$OPT_WIZARD")
 
 CHOICE=$(echo "$MENU" | rofi -dmenu -i -p "⚡ Power & GPU" -config "${XDG_CONFIG_HOME:-$HOME/.config}/rofi/config.rasi" || true)
 
@@ -70,5 +72,16 @@ case "$CHOICE" in
         notify-send -u normal -a "Hardware Telemetry" -i video-display \
             "Hardware Status" \
             "CPU Usage: ${CPU_UTIL}\nGPU: ${GPU_UTIL} (${GPU_TEMP})\nBattery: ${BAT_CAP}% (${BAT_STAT})\nActive GPU Processes:\n${PROCS}"
+        ;;
+    *"Hardware Wizard"*)
+        if command -v kitty >/dev/null; then
+            kitty --title "Hardware Wizard" -e bash -c "hardware-wizard.sh; echo ''; read -rp 'Press Enter to exit...' dummy" &
+        elif command -v alacritty >/dev/null; then
+            alacritty -t "Hardware Wizard" -e bash -c "hardware-wizard.sh; echo ''; read -rp 'Press Enter to exit...' dummy" &
+        elif command -v foot >/dev/null; then
+            foot -T "Hardware Wizard" bash -c "hardware-wizard.sh; echo ''; read -rp 'Press Enter to exit...' dummy" &
+        else
+            x-terminal-emulator -e bash -c "hardware-wizard.sh; echo ''; read -rp 'Press Enter to exit...' dummy" &
+        fi
         ;;
 esac

@@ -21,11 +21,11 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 ### Highlights
 
 - **Windows 11 style Waybar** — auto-hides at the top, shows on hover, pin/unpin with one click
-- **NVIDIA optimized** — env vars, no hardware cursors, blur/shadow disabled for smooth performance
+- **Universal CPU & GPU Driver Wizard** — auto-detects Intel/AMD CPUs and GPUs (Intel UHD/Iris/Arc, AMD Radeon, NVIDIA Turing+ open, NVIDIA Pascal/Maxwell 580xx legacy, VMs), recommends and installs optimal drivers, and manages dynamic Hyprland environments
 - **Instant wallpaper** — hyprpaper loads your wallpaper at boot with zero delay
-- **One-command installer** — `./install.sh` auto-installs packages, yay, fonts, configs, and the correct NVIDIA driver (Pascal → `nvidia-580xx-dkms` per Arch News); see [INSTALL.md](INSTALL.md)
+- **One-command installer** — `./install.sh` handles official packages, yay, fonts, configs, and complete hardware acceleration automatically; see [INSTALL.md](INSTALL.md)
 - **10 workspaces** — full keyboard + mouse scroll navigation
-- **Interactive GPU & Power Switcher** — click the Waybar battery icon to switch between Integrated (Intel), Hybrid, or Performance (NVIDIA) modes and monitor live CPU, GPU, and battery stats
+- **Interactive GPU & Power Switcher** — click the Waybar battery icon to switch between Integrated, Hybrid, or Performance modes, diagnose drivers via Hardware Wizard, and monitor live CPU, GPU, and battery telemetry
 
 ---
 
@@ -56,7 +56,8 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 .
 ├── config/
 │   ├── hypr/
-│   │   ├── hyprland.conf            # Main Hyprland config (NVIDIA tuned)
+│   │   ├── hyprland.conf            # Main Hyprland config
+│   │   ├── gpu-env.conf             # Dynamic CPU/GPU environment & cursor config
 │   │   ├── hyprpaper.conf           # Wallpaper preload (instant boot wallpaper)
 │   │   ├── hyprlock.conf            # Screen locker (blur background, PAM auth)
 │   │   ├── waybar-autohide.sh       # Win11-style auto show/hide logic
@@ -89,6 +90,7 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 │   ├── environment.d/
 │   │   └── 90-dark-theme.conf        # System-wide dark mode environment
 │   └── local-bin/
+│       ├── hardware-wizard.sh        # Universal CPU & GPU detection & driver setup
 │       ├── launcher-toggle.sh        # Rofi toggle (Super+Space)
 │       ├── systemupdate.sh           # Waybar update checker
 │       ├── waypaper-toggle.sh        # Waypaper toggle
@@ -333,21 +335,43 @@ sudo ~/dotfiles/nvidia/setup-nvidia.sh
 sudo reboot
 ```
 
-### Hyprland env (in `hyprland.conf`)
+### Universal CPU & GPU Hardware Wizard
 
-```ini
-env = LIBVA_DRIVER_NAME,nvidia
-env = XDG_SESSION_TYPE,wayland
-env = GBM_BACKEND,nvidia-drm
-env = __GLX_VENDOR_LIBRARY_NAME,nvidia
-env = NVD_BACKEND,direct
-env = ELECTRON_OZONE_PLATFORM_HINT,auto
-env = MOZ_ENABLE_WAYLAND,1
-```
+This dotfiles repository includes a built-in, intelligent hardware detection wizard (`hardware-wizard.sh`) that dynamically configures the optimal driver stack and Hyprland environment for your specific machine.
 
-Tweaks for mobile GPUs: no hardware cursors, blur/shadow off, Qt Wayland + XCB fallback.
+#### Supported Hardware Matrix
 
-> AMD/Intel only: comment out the NVIDIA `env` lines in `hyprland.conf`.
+| Hardware Type | Detected Architecture | Optimal Driver Stack | Hyprland Environment (`gpu-env.conf`) |
+|---------------|-----------------------|----------------------|---------------------------------------|
+| **Intel CPU** | Core / Xeon / Celeron | `intel-ucode`, `intel_pstate` scaling | N/A |
+| **AMD CPU** | Ryzen / Threadripper / EPYC | `amd-ucode`, `amd_pstate` scaling | N/A |
+| **Intel GPU** | UHD / Iris Xe / Arc | `mesa`, `vulkan-intel`, `intel-media-driver` (iHD VA-API) | `LIBVA_DRIVER_NAME,iHD`, hardware cursors enabled |
+| **AMD GPU** | Radeon RX / Vega / RDNA | `mesa`, `vulkan-radeon`, `libva-mesa-driver`, `mesa-vdpau` | `LIBVA_DRIVER_NAME,radeonsi`, hardware cursors enabled |
+| **NVIDIA (Turing+)** | RTX 20xx+, GTX 16xx+, RTX 30xx/40xx/50xx | `nvidia-open`, `nvidia-utils`, `libva-nvidia-driver` | Dedicated DRM KMS, `no_hardware_cursors = true` |
+| **NVIDIA (Pascal/Maxwell)** | GTX 10xx, GTX 9xx, GTX 750 (e.g. GTX 1050 Ti) | AUR `nvidia-580xx-dkms`, `nvidia-580xx-utils` (per Arch News) | Legacy branch protection, `no_hardware_cursors = true` |
+| **Hybrid (Optimus/Prime)** | Intel iGPU / AMD iGPU + NVIDIA dGPU | iGPU acceleration + NVIDIA driver + `prime-run` | Desktop on iGPU (no GBM crash), offload on demand |
+| **Virtual Machine** | QEMU / KVM, VMware, VirtualBox | `mesa`, guest agents | `WLR_NO_HARDWARE_CURSORS,1` |
+
+#### Running the Wizard
+
+- **Via Waybar Battery Icon**: Click the battery module in Waybar and select **"🔧 Hardware Wizard"**.
+- **Interactive Terminal Scan**:
+  ```bash
+  hardware-wizard.sh
+  ```
+- **Diagnostic Health Check (Status Only)**:
+  ```bash
+  hardware-wizard.sh --check
+  ```
+  *(Integrated into `./update.sh` to alert if kernel upgrades or driver packages need attention)*
+- **Non-Interactive Auto Install**:
+  ```bash
+  hardware-wizard.sh --auto
+  ```
+- **Regenerate Environment Only**:
+  ```bash
+  hardware-wizard.sh --env-only
+  ```
 
 ### Hyprland 0.55+
 

@@ -70,9 +70,14 @@ if pacman -Q nvidia-580xx-dkms &>/dev/null; then
     dkms status 2>/dev/null | grep nvidia || true
 fi
 
-# --- 6. Verify ---
-echo ""
-if command -v nvidia-smi >/dev/null; then
+# --- 6. Hardware & Driver Health Check ---
+info "Running Universal Hardware & Driver Health Check..."
+if [[ -x "$REPO/config/local-bin/hardware-wizard.sh" ]]; then
+    "$REPO/config/local-bin/hardware-wizard.sh" --check || {
+        warn "Driver or hardware stack has missing packages or needs attention."
+        info "Run 'hardware-wizard.sh' in terminal to automatically install missing packages."
+    }
+elif command -v nvidia-smi >/dev/null; then
     nvidia-smi --query-gpu=name,driver_version --format=csv,noheader 2>/dev/null && success "NVIDIA OK" || warn "nvidia-smi failed — reboot may fix"
 fi
 

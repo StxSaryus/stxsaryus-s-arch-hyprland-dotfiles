@@ -244,6 +244,19 @@ install_aur_packages() {
     success "AUR packages installed"
 }
 
+setup_hardware() {
+    section "Universal CPU & GPU Hardware Wizard"
+    if [[ -x "$REPO/config/local-bin/hardware-wizard.sh" ]]; then
+        if [[ "$SKIP_CONFIRM" -eq 1 ]]; then
+            "$REPO/config/local-bin/hardware-wizard.sh" --auto
+        else
+            "$REPO/config/local-bin/hardware-wizard.sh"
+        fi
+    else
+        setup_nvidia
+    fi
+}
+
 setup_nvidia() {
     [[ "$OPT_NVIDIA" -eq 1 ]] || return 0
     [[ "$NVIDIA_DRIVER" == "none" ]] && return 0
@@ -347,7 +360,7 @@ link_configs() {
         warn "Moved hyprland.lua aside (Hyprland 0.55+ prefers .lua over .conf)"
     fi
     local f
-    for f in waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh hyprpaper.conf apply-dark-theme.sh hyprlock.conf; do
+    for f in waybar-autohide.sh brightness-osd.sh wallpaper-sync.sh hyprpaper.conf apply-dark-theme.sh hyprlock.conf gpu-env.conf; do
         backup_and_link "$REPO/config/hypr/$f" "$HOME/.config/hypr/$f"
     done
 
@@ -387,7 +400,7 @@ link_configs() {
         done
     fi
     mkdir -p "$HOME/.local/share/bin" "$HOME/.local/bin"
-    for f in launcher-toggle.sh systemupdate.sh waypaper-toggle.sh setup-file-share.sh bt-headset.sh fix-localsend.sh gpu-power-menu.sh prime-run; do
+    for f in launcher-toggle.sh systemupdate.sh waypaper-toggle.sh setup-file-share.sh bt-headset.sh fix-localsend.sh gpu-power-menu.sh prime-run hardware-wizard.sh; do
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/share/bin/$f"
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/bin/$f"
     done
@@ -403,7 +416,9 @@ set_permissions() {
         "$HOME/.config/hypr/"*.sh \
         "$HOME/.config/waybar/"*.sh \
         "$HOME/.config/waybar/scripts/"*.sh \
-        "$HOME/.local/share/bin/"*.sh \
+        "$HOME/.local/share/bin/"* \
+        "$HOME/.local/bin/"* \
+        "$REPO/config/local-bin/"* \
         "$REPO/nvidia/setup-nvidia.sh" 2>/dev/null || true
     echo "1" > "$HOME/.config/waybar/.pinned"
     # Apply dark theme immediately when gsettings is available
@@ -500,7 +515,7 @@ print_plan() {
 run_full_install() {
     install_pacman_packages
     install_aur_packages
-    setup_nvidia
+    setup_hardware
     setup_greetd
     setup_file_share
     link_configs
@@ -538,7 +553,7 @@ case "$MODE" in
     packages)
         install_pacman_packages
         install_aur_packages
-        setup_nvidia
+        setup_hardware
         setup_greetd
         ;;
 esac

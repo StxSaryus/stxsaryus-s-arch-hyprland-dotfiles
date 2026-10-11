@@ -1,6 +1,6 @@
 # Installation Guide — StxSaryus Arch Hyprland Dotfiles
 
-One script. Full rice. NVIDIA Pascal handled per **official Arch Linux news**.
+One script. Full rice. Universal CPU & GPU auto-detection (Intel, AMD, NVIDIA, VMs).
 
 ---
 
@@ -14,13 +14,14 @@ chmod +x install.sh
 sudo reboot
 ```
 
-`./install.sh` shows official notices, detects your GPU, installs packages + yay + configs,
-and sets up NVIDIA correctly. Press **Enter** once to confirm (or use `./install.sh --auto`).
+`./install.sh` shows official notices, detects your CPU & GPU architecture, installs packages + yay + configs,
+runs the Universal Hardware Wizard to configure optimal drivers, and sets up your system. Press **Enter** once to confirm (or use `./install.sh --auto`).
 
 After reboot:
 
 ```bash
-nvidia-smi          # should list your GPU
+hardware-wizard.sh --check   # verifies all drivers & acceleration stack
+nvidia-smi                   # if NVIDIA GPU present, lists status and temperature
 ```
 
 ---
@@ -99,18 +100,27 @@ greetd: off by default (enable in `--interactive`).
 ### Pacman (core)
 
 Hyprland stack, Waybar, SwayNC, PipeWire, Blueman, portals, fonts (`ttf-jetbrains-mono-nerd`),
-`linux-headers`, `dkms`, chosen terminal/browser/FM/launcher.
+`mesa`, chosen terminal/browser/FM/launcher.
+
+### Hardware Acceleration (Configured by Hardware Wizard)
+
+- **Intel**: `intel-ucode`, `vulkan-intel`, `intel-media-driver` (iHD VA-API)
+- **AMD**: `amd-ucode`, `vulkan-radeon`, `libva-mesa-driver`, `mesa-vdpau`
+- **NVIDIA**: `nvidia-open` (Turing+) or AUR `nvidia-580xx-dkms` (Pascal/Maxwell), `libva-nvidia-driver`, `nvidia-prime`, `linux-headers`, `dkms`
+- **VM**: VM graphics and guest interaction agents
 
 ### AUR (via yay — auto-installed if missing)
 
 - `oh-my-zsh-git`, `zsh-theme-powerlevel10k-git`
 - `waypaper-git` (if enabled)
-- `nvidia-580xx-dkms` + `nvidia-580xx-utils` (Pascal / older only)
+- `nvidia-580xx-dkms` + `nvidia-580xx-utils` (Pascal / Maxwell GPUs)
+- `lib32-nvidia-580xx-utils` (for 32-bit gaming on Pascal)
 
-### Configs linked / copied
+### Configs linked / managed
 
-`hypr/`, `waybar/`, `rofi/`, `kitty/`, `swaync/`, `waypaper/`, `~/.local/share/bin/`,
-`.zshrc`, `.bashrc`. `hyprland.conf` is copied and patched (not symlinked).
+`hypr/` (including dynamic `gpu-env.conf`), `waybar/`, `rofi/`, `kitty/`, `swaync/`, `waypaper/`,
+`~/.local/share/bin/`, `~/.local/bin/` (`hardware-wizard.sh`, `prime-run`, `gpu-power-menu.sh`),
+`.zshrc`, `.bashrc`.
 
 ---
 
