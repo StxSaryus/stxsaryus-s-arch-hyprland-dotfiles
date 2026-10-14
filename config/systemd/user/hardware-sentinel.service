@@ -1,0 +1,14 @@
+[Unit]
+Description=StxSaryus Universal Hardware & Driver Sentinel - Periodic Check & Notification
+Documentation=https://github.com/StxSaryus/stxsaryus-s-arch-hyprland-dotfiles
+After=graphical-session.target network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash "%h/.local/share/bin/hardware-sentinel.sh"
+Environment="PATH=%h/.local/bin:%h/.local/share/bin:/usr/local/bin:/usr/bin:/bin"
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

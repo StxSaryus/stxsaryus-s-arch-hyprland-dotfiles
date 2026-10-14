@@ -1,0 +1,15 @@
+[Trigger]
+Operation = Upgrade
+Operation = Install
+Type = Package
+Target = linux
+Target = linux-lts
+Target = linux-zen
+Target = linux-headers
+Target = nvidia*
+Target = mesa*
+
+[Action]
+Description = [StxSaryus Dotfiles] Verifying DKMS modules and Hyprland GPU environment...
+When = PostTransaction
+Exec = /usr/bin/bash -c 'for u in $(loginctl list-users --no-legend | awk "{print \$2}"); do uhome=$(getent passwd "$u" | cut -d: -f6); if [[ -x "$uhome/.local/share/bin/hardware-wizard.sh" ]]; then sudo -u "$u" "$uhome/.local/share/bin/hardware-wizard.sh" --env-only >/dev/null 2>&1 || true; fi; done'

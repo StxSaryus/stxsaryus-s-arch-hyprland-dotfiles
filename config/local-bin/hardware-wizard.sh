@@ -87,6 +87,9 @@ Options:
   --check         Check driver health, missing packages, and DKMS status (no changes)
   --auto          Non-interactive: auto-detect and install recommended drivers
   --env-only      Only generate ~/.config/hypr/gpu-env.conf based on detected hardware
+  --check-missing Output missing package names (used by Sentinel & automation)
+  --check-updates Check if upstream driver/kernel packages have pending updates
+  --check-status  Output structured health & telemetry summary
   -h, --help      Display this help dialog
 
 Supported Hardware:
@@ -440,6 +443,33 @@ print_package_table() {
     echo ""
 }
 
+detect_drm_devices_env() {
+    local igpu="" dgpu=""
+    if compgen -G "/dev/dri/by-path/*-card" >/dev/null; then
+        for dev in /dev/dri/by-path/*-card; do
+            local pci_dev
+            pci_dev="$(basename "$dev" | sed "s/-card$//" | sed "s/^pci-//")"
+            if [[ -d "/sys/bus/pci/devices/$pci_dev" ]]; then
+                local vendor
+                vendor="$(cat "/sys/bus/pci/devices/$pci_dev/vendor" 2>/dev/null || echo "")"
+                case "$vendor" in
+                    0x8086) igpu="$dev" ;;
+                    0x1002)
+                        if [[ -z "$igpu" ]]; then igpu="$dev"; else dgpu="$dev"; fi ;;
+                    0x10de) dgpu="$dev" ;;
+                esac
+            fi
+        done
+    fi
+    if [[ -n "$igpu" && -n "$dgpu" ]]; then
+        echo "$igpu:$dgpu"
+    elif [[ -n "$igpu" ]]; then
+        echo "$igpu"
+    elif [[ -n "$dgpu" ]]; then
+        echo "$dgpu"
+    fi
+}
+
 generate_gpu_env() {
     local target_file="${HOME}/.config/hypr/gpu-env.conf"
     local repo_file=""
@@ -489,6 +519,11 @@ EOF
 # Run 3D games and apps on NVIDIA discrete GPU using: prime-run <app>
 env = LIBVA_DRIVER_NAME,nvidia
 env = NVD_BACKEND,direct
+
+cursor {
+    no_hardware_cursors = true
+}
+EOF
 
 cursor {
     no_hardware_cursors = true
@@ -593,6 +628,7 @@ setup_nvidia_system_files() {
 options nvidia-drm modeset=1 fbdev=1
 options nvidia NVreg_PreserveVideoMemoryAllocations=1
 options nvidia NVreg_TemporaryFilePath=/var/tmp
+options nvidia NVreg_DynamicPowerManagement=0x02
 EOF
     fi
 
@@ -720,6 +756,25 @@ run_diagnostics() {
     fi
 }
 
+check_upstream_driver_updates() {
+    local updates=()
+    if command -v checkupdates >/dev/null 2>&1; then
+        while IFS= read -r u; do
+            [[ -n "$u" ]] && updates+=("$u")
+        done < <(checkupdates 2>/dev/null | grep -E '^linux([ -]|$)|^nvidia|^mesa|^vulkan|^intel-media-driver|^libva' || true)
+    fi
+    if command -v yay >/dev/null 2>&1; then
+        while IFS= read -r u; do
+            [[ -n "$u" ]] && updates+=("$u")
+        done < <(yay -Qua 2>/dev/null | grep -E '^linux([ -]|$)|^nvidia|^mesa|^vulkan|^intel-media-driver|^libva' || true)
+    fi
+    if [[ "${#updates[@]}" -gt 0 ]]; then
+        printf '%s\n' "${updates[@]}"
+        return 0
+    fi
+    return 1
+}
+
 # --- Main Flow ---
 
 case "${1:-}" in
@@ -729,6 +784,15 @@ case "${1:-}" in
         ;;
     --check)
         MODE="check"
+        ;;
+    --check-missing)
+        MODE="check-missing"
+        ;;
+    --check-updates)
+        MODE="check-updates"
+        ;;
+    --check-status)
+        MODE="check-status"
         ;;
     --auto)
         MODE="auto"
@@ -754,6 +818,42 @@ audit_installed_packages
 
 if [[ "$MODE" == "env-only" ]]; then
     generate_gpu_env
+    exit 0
+fi
+
+if [[ "$MODE" == "check-missing" ]]; then
+    all_missing=("${MISSING_PACMAN[@]}" "${MISSING_AUR[@]}")
+    if [[ "${#all_missing[@]}" -gt 0 ]]; then
+        echo "${all_missing[*]}"
+        exit 1
+    else
+        exit 0
+    fi
+fi
+
+if [[ "$MODE" == "check-updates" ]]; then
+    if check_upstream_driver_updates; then
+        exit 2
+    else
+        echo "No driver updates available"
+        exit 0
+    fi
+fi
+
+if [[ "$MODE" == "check-status" ]]; then
+    all_missing=("${MISSING_PACMAN[@]}" "${MISSING_AUR[@]}")
+    dkms_ok=1
+    if command -v dkms >/dev/null 2>&1; then
+        if ! dkms status 2>/dev/null | grep -qE "(installed|built)"; then
+            dkms_ok=0
+        fi
+    fi
+    echo "TOPOLOGY=\"$TOPOLOGY\""
+    echo "CPU_VENDOR=\"$CPU_VENDOR\""
+    echo "NVIDIA_BRANCH=\"$NVIDIA_BRANCH\""
+    echo "MISSING_COUNT=\"${#all_missing[@]}\""
+    echo "MISSING_PKGS=\"${all_missing[*]}\""
+    echo "DKMS_OK=\"$dkms_ok\""
     exit 0
 fi
 

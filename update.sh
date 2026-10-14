@@ -40,8 +40,30 @@ banner "System + dotfiles update"
 # --- 1. Dotfiles repo ---
 info "Pulling latest dotfiles from GitHub..."
 cd "$REPO"
-git pull --rebase origin main || git pull origin main
-success "Dotfiles repo up to date: $(git log -1 --oneline)"
+STASHED=0
+if ! git diff --quiet 2>/dev/null || ! git diff --staged --quiet 2>/dev/null; then
+    info "Stashing local changes before pull..."
+    git stash push -m "autostash-update-$(date +%s)" >/dev/null 2>&1 && STASHED=1 || true
+fi
+
+PULL_SUCCESS=0
+if git pull --rebase origin main >/dev/null 2>&1; then
+    PULL_SUCCESS=1
+elif git pull origin main >/dev/null 2>&1; then
+    PULL_SUCCESS=1
+elif git pull --rebase https://github.com/StxSaryus/stxsaryus-s-arch-hyprland-dotfiles.git main >/dev/null 2>&1; then
+    PULL_SUCCESS=1
+fi
+
+if [[ "$STASHED" -eq 1 ]]; then
+    git stash pop >/dev/null 2>&1 || warn "Stash pop had minor conflicts — local changes preserved in git stash"
+fi
+
+if [[ "$PULL_SUCCESS" -eq 1 ]]; then
+    success "Dotfiles repo up to date: $(git log -1 --oneline)"
+else
+    warn "Could not fetch dotfiles from remote (offline or auth issue) — continuing with local update"
+fi
 
 # --- 2. Official packages ---
 info "Updating official packages (pacman -Syu)..."
@@ -79,6 +101,13 @@ if [[ -x "$REPO/config/local-bin/hardware-wizard.sh" ]]; then
     }
 elif command -v nvidia-smi >/dev/null; then
     nvidia-smi --query-gpu=name,driver_version --format=csv,noheader 2>/dev/null && success "NVIDIA OK" || warn "nvidia-smi failed — reboot may fix"
+fi
+
+# --- 7. Hardware Sentinel Service ---
+if [[ -f "$HOME/.config/systemd/user/hardware-sentinel.timer" ]]; then
+    systemctl --user daemon-reload 2>/dev/null || true
+    systemctl --user enable --now hardware-sentinel.timer 2>/dev/null || true
+    success "Hardware Sentinel background service active"
 fi
 
 banner "Update complete"

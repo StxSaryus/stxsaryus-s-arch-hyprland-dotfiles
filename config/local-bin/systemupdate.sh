@@ -9,11 +9,19 @@ which paru &>/dev/null && aurhlpr="paru"
 
 if [ "$1" == "up" ]; then
     trap 'pkill -RTMIN+20 waybar' EXIT
-    command="
-    fastfetch
-    $aurhlpr -Syu
-    read -n 1 -p 'Press any key to continue...'
-    "
+    if [[ -x "$HOME/dotfiles/update.sh" ]]; then
+        command="
+        \"$HOME/dotfiles/update.sh\"
+        echo ''
+        read -n 1 -p 'Press any key to exit...'
+        "
+    else
+        command="
+        fastfetch
+        $aurhlpr -Syu
+        read -n 1 -p 'Press any key to continue...'
+        "
+    fi
     kitty --title systemupdate sh -c "${command}"
     exit 0
 fi

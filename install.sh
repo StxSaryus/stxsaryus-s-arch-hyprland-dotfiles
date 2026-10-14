@@ -188,7 +188,7 @@ install_pacman_packages() {
     need_sudo
     local pkgs=(
         hyprland hyprlock hypridle hyprpaper hyprpicker hyprpolkitagent
-        waybar swaync wlogout nwg-bar brightnessctl
+        waybar swaync libnotify wlogout nwg-bar brightnessctl
         pipewire-pulse pipewire-alsa pipewire-jack pavucontrol pamixer playerctl
         bluez bluez-utils bluez-obex blueman localsend
         zsh zsh-completions
@@ -254,6 +254,13 @@ setup_hardware() {
         fi
     else
         setup_nvidia
+    fi
+
+    if [[ -f "$REPO/config/pacman/hooks/99-hardware-sentinel.hook" ]]; then
+        need_sudo
+        sudo mkdir -p /etc/pacman.d/hooks
+        sudo install -Dm644 "$REPO/config/pacman/hooks/99-hardware-sentinel.hook" /etc/pacman.d/hooks/99-hardware-sentinel.hook 2>/dev/null || true
+        success "Pacman post-transaction hardware hook installed"
     fi
 }
 
@@ -329,11 +336,18 @@ backup_and_link() {
 
 copy_and_patch_hypr() {
     mkdir -p "$(dirname "$HYPR_CONF")"
-    if [[ -e "$HYPR_CONF" && ! -L "$HYPR_CONF" ]]; then
-        mv "$HYPR_CONF" "${HYPR_CONF}.bak.$(date +%s)"
-        warn "Backed up: $HYPR_CONF"
+    if [[ "$MODE" == "interactive" ]]; then
+        if [[ -L "$HYPR_CONF" ]]; then
+            rm -f "$HYPR_CONF"
+        elif [[ -e "$HYPR_CONF" ]]; then
+            mv "$HYPR_CONF" "${HYPR_CONF}.bak.$(date +%s)"
+            warn "Backed up: $HYPR_CONF"
+        fi
+        cp "$REPO/config/hypr/hyprland.conf" "$HYPR_CONF"
+        patch_hyprland_conf
+    else
+        backup_and_link "$REPO/config/hypr/hyprland.conf" "$HYPR_CONF"
     fi
-    cp "$REPO/config/hypr/hyprland.conf" "$HYPR_CONF"
 }
 
 patch_hyprland_conf() {
@@ -400,15 +414,22 @@ link_configs() {
         done
     fi
     mkdir -p "$HOME/.local/share/bin" "$HOME/.local/bin"
-    for f in launcher-toggle.sh systemupdate.sh waypaper-toggle.sh setup-file-share.sh bt-headset.sh fix-localsend.sh gpu-power-menu.sh prime-run hardware-wizard.sh; do
+    for f in launcher-toggle.sh systemupdate.sh waypaper-toggle.sh setup-file-share.sh bt-headset.sh fix-localsend.sh gpu-power-menu.sh prime-run hardware-wizard.sh hardware-sentinel.sh; do
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/share/bin/$f"
         backup_and_link "$REPO/config/local-bin/$f" "$HOME/.local/bin/$f"
     done
+    if [[ -d "$REPO/config/systemd/user" ]]; then
+        mkdir -p "$HOME/.config/systemd/user"
+        for f in "$REPO/config/systemd/user/"*; do
+            [[ -f "$f" ]] && backup_and_link "$f" "$HOME/.config/systemd/user/$(basename "$f")"
+        done
+        systemctl --user daemon-reload 2>/dev/null || true
+        systemctl --user enable --now hardware-sentinel.timer 2>/dev/null || true
+    fi
     backup_and_link "$REPO/zsh/.zshrc" "$HOME/.zshrc"
     backup_and_link "$REPO/bash/.bashrc" "$HOME/.bashrc"
     copy_and_patch_hypr
-    patch_hyprland_conf
-    success "Configs linked + hyprland.conf patched"
+    success "Configs linked and systemd units enabled"
 }
 
 set_permissions() {
