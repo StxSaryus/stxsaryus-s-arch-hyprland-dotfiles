@@ -524,11 +524,6 @@ cursor {
     no_hardware_cursors = true
 }
 EOF
-
-cursor {
-    no_hardware_cursors = true
-}
-EOF
             ;;
         PURE_NVIDIA)
             cat <<EOF >> "$tmp"
