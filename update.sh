@@ -94,6 +94,15 @@ fi
 
 # --- 6. Hardware & Driver Health Check ---
 info "Running Universal Hardware & Driver Health Check..."
+NVIDIA_MISMATCH=0
+if [[ -f /proc/driver/nvidia/version ]]; then
+    LOADED_NV="$(awk '/NVRM version:/ {for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\.[0-9]+/) {print $i; exit}}' /proc/driver/nvidia/version 2>/dev/null || true)"
+    INSTALLED_NV="$(pacman -Q nvidia-580xx-utils nvidia-utils nvidia-470xx-utils 2>/dev/null | head -n1 | awk '{print $2}' | cut -d'-' -f1 || true)"
+    if [[ -n "$LOADED_NV" && -n "$INSTALLED_NV" && "$LOADED_NV" != "$INSTALLED_NV"* ]]; then
+        NVIDIA_MISMATCH=1
+    fi
+fi
+
 if [[ -x "$REPO/config/local-bin/hardware-wizard.sh" ]]; then
     "$REPO/config/local-bin/hardware-wizard.sh" --check || {
         warn "Driver or hardware stack has missing packages or needs attention."
@@ -111,5 +120,17 @@ if [[ -f "$HOME/.config/systemd/user/hardware-sentinel.timer" ]]; then
 fi
 
 banner "Update complete"
-echo -e "${BOLD}If the kernel was updated, reboot:${NC}  sudo reboot"
-echo ""
+if [[ "$NVIDIA_MISMATCH" -eq 1 ]]; then
+    echo -e "${YELLOW}${BOLD}╭────────────────────────────────────────────────────────────────────╮${NC}"
+    echo -e "${YELLOW}${BOLD}│  [ACTION REQUIRED] NVIDIA DRIVER UPGRADE REBOOT NOTICE             │${NC}"
+    echo -e "${YELLOW}${BOLD}├────────────────────────────────────────────────────────────────────┤${NC}"
+    echo -e "${YELLOW}${BOLD}│  • Kernel Module in RAM:  ${LOADED_NV}                                 │${NC}"
+    echo -e "${YELLOW}${BOLD}│  • Updated on Disk:       ${INSTALLED_NV}                                 │${NC}"
+    echo -e "${YELLOW}${BOLD}│                                                                    │${NC}"
+    echo -e "${YELLOW}${BOLD}│  New driver & UKI images were built. Reboot to load the new driver:│${NC}"
+    echo -e "${YELLOW}${BOLD}│    sudo reboot                                                     │${NC}"
+    echo -e "${YELLOW}${BOLD}╰────────────────────────────────────────────────────────────────────╯${NC}\n"
+else
+    echo -e "${BOLD}If the kernel or drivers were updated, reboot:${NC}  sudo reboot"
+    echo ""
+fi

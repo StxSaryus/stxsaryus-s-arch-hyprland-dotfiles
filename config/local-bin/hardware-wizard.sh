@@ -714,6 +714,24 @@ install_packages() {
     generate_gpu_env
 }
 
+check_nvidia_version_match() {
+    NVIDIA_VERSION_MISMATCH=0
+    NVIDIA_LOADED_VER=""
+    NVIDIA_INSTALLED_VER=""
+    [[ "$HAS_NVIDIA_GPU" -eq 1 ]] || return 0
+
+    if [[ -f /proc/driver/nvidia/version ]]; then
+        NVIDIA_LOADED_VER="$(awk '/NVRM version:/ {for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\.[0-9]+/) {print $i; exit}}' /proc/driver/nvidia/version 2>/dev/null || true)"
+    fi
+    NVIDIA_INSTALLED_VER="$(pacman -Q nvidia-580xx-utils nvidia-utils nvidia-470xx-utils 2>/dev/null | head -n1 | awk '{print $2}' | cut -d'-' -f1 || true)"
+
+    if [[ -n "$NVIDIA_LOADED_VER" && -n "$NVIDIA_INSTALLED_VER" && "$NVIDIA_LOADED_VER" != "$NVIDIA_INSTALLED_VER"* ]]; then
+        NVIDIA_VERSION_MISMATCH=1
+        return 1
+    fi
+    return 0
+}
+
 run_diagnostics() {
     section "System Diagnostics & Telemetry"
 
@@ -742,12 +760,23 @@ run_diagnostics() {
         vainfo --display drm 2>&1 | grep -iE 'va_openDriverAttribute|Driver version' | head -4 || true
     fi
 
-    # NVIDIA-SMI
-    if [[ "$HAS_NVIDIA_GPU" -eq 1 ]] && command -v nvidia-smi >/dev/null 2>&1; then
-        echo -e "\n${BOLD}NVIDIA SMI Telemetry:${NC}"
-        nvidia-smi --query-gpu=name,driver_version,temperature.gpu,utilization.gpu --format=csv,noheader 2>/dev/null \
-            && success "NVIDIA Driver active and communicating with hardware" \
-            || warn "NVIDIA driver not loaded into running kernel (Reboot required)"
+    # NVIDIA GPU & Driver Status
+    if [[ "$HAS_NVIDIA_GPU" -eq 1 ]]; then
+        echo -e "\n${BOLD}NVIDIA GPU & Driver Status:${NC}"
+        check_nvidia_version_match || true
+        if [[ "${NVIDIA_VERSION_MISMATCH:-0}" -eq 1 ]]; then
+            warn "NVIDIA Driver/library version mismatch detected!"
+            echo -e "    ${RED}• Kernel Module in RAM:${NC} ${NVIDIA_LOADED_VER}"
+            echo -e "    ${CYAN}• Package on Disk:${NC}      ${NVIDIA_INSTALLED_VER}"
+            echo -e "    ${YELLOW}• Cause:${NC} Driver packages were updated during the current session."
+            echo -e "    ${BOLD}• Resolution:${NC} System reboot required to load the new kernel module (${CYAN}sudo reboot${NC})."
+        elif command -v nvidia-smi >/dev/null 2>&1; then
+            if nvidia-smi --query-gpu=name,driver_version,temperature.gpu,utilization.gpu --format=csv,noheader 2>/dev/null; then
+                success "NVIDIA Driver active and communicating with hardware"
+            else
+                warn "NVIDIA driver not responding (Reboot may be required)"
+            fi
+        fi
     fi
 }
 
@@ -843,12 +872,16 @@ if [[ "$MODE" == "check-status" ]]; then
             dkms_ok=0
         fi
     fi
+    check_nvidia_version_match || true
     echo "TOPOLOGY=\"$TOPOLOGY\""
     echo "CPU_VENDOR=\"$CPU_VENDOR\""
     echo "NVIDIA_BRANCH=\"$NVIDIA_BRANCH\""
     echo "MISSING_COUNT=\"${#all_missing[@]}\""
     echo "MISSING_PKGS=\"${all_missing[*]}\""
     echo "DKMS_OK=\"$dkms_ok\""
+    echo "DRIVER_MISMATCH=\"${NVIDIA_VERSION_MISMATCH:-0}\""
+    echo "LOADED_VER=\"${NVIDIA_LOADED_VER:-}\""
+    echo "INSTALLED_VER=\"${NVIDIA_INSTALLED_VER:-}\""
     exit 0
 fi
 
@@ -858,7 +891,11 @@ if [[ "$MODE" == "check" ]]; then
     run_diagnostics
 
     total_missing=$((${#MISSING_PACMAN[@]} + ${#MISSING_AUR[@]} + ${#CONFLICTING_PKGS[@]}))
-    if [[ "$total_missing" -eq 0 ]]; then
+    if [[ "${NVIDIA_VERSION_MISMATCH:-0}" -eq 1 ]]; then
+        echo -e "\n${YELLOW}${BOLD}⚠ Action required: NVIDIA kernel module and userland driver version mismatch!${NC}"
+        echo -e "Please reboot your system (${CYAN}sudo reboot${NC}) to load the updated ${NVIDIA_INSTALLED_VER} kernel module.\n"
+        exit 1
+    elif [[ "$total_missing" -eq 0 ]]; then
         echo -e "\n${GREEN}${BOLD}✓ Driver and hardware stack are in optimal state.${NC}\n"
         exit 0
     else

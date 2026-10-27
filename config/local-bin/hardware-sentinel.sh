@@ -80,6 +80,11 @@ if [[ "${DKMS_OK:-1}" -eq 0 ]]; then
     ISSUES+=("DKMS Kernel Module mismatch for $(uname -r)")
 fi
 
+if [[ "${DRIVER_MISMATCH:-0}" -eq 1 ]]; then
+    NEEDS_ATTENTION=1
+    ISSUES+=("NVIDIA Driver Updated (RAM: ${LOADED_VER:-?} vs Disk: ${INSTALLED_VER:-?}) — System Reboot Required")
+fi
+
 if [[ "${MISSING_COUNT:-0}" -gt 0 ]]; then
     NEEDS_ATTENTION=1
     ISSUES+=("Missing Acceleration Package(s): ${MISSING_PKGS:-}")
@@ -97,6 +102,7 @@ if [[ "$MODE" == "status" ]]; then
     echo "CPU Vendor:      ${CPU_VENDOR:-UNKNOWN}"
     echo "NVIDIA Branch:   ${NVIDIA_BRANCH:-none}"
     echo "DKMS OK:         ${DKMS_OK:-1}"
+    echo "Driver Mismatch: ${DRIVER_MISMATCH:-0} (Loaded: ${LOADED_VER:-none}, Disk: ${INSTALLED_VER:-none})"
     echo "Missing Packages: ${MISSING_PKGS:-none}"
     echo "Driver Updates:  ${DRIVER_UPDATES:-none}"
     echo "Needs Attention: $NEEDS_ATTENTION"

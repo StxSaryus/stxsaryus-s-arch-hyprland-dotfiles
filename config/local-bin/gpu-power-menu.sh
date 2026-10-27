@@ -12,13 +12,29 @@ PROFILE="$(powerprofilesctl get 2>/dev/null || echo "balanced")"
 CPU_UTIL="$(top -bn1 | grep 'Cpu(s)' | awk '{printf "%.0f%%", 100 - $8}' 2>/dev/null || echo "N/A")"
 
 # 3. Live GPU stats
-GPU_RAW="$(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits 2>/dev/null || true)"
-if [[ -n "$GPU_RAW" ]]; then
-    GPU_UTIL="$(echo "$GPU_RAW" | awk -F', ' '{print $1}')%"
-    GPU_TEMP="$(echo "$GPU_RAW" | awk -F', ' '{print $2}')°C"
+GPU_MISMATCH=0
+LOADED_NV=""
+INSTALLED_NV=""
+if [[ -f /proc/driver/nvidia/version ]]; then
+    LOADED_NV="$(awk '/NVRM version:/ {for(i=1;i<=NF;i++) if($i ~ /^[0-9]+\.[0-9]+/) {print $i; exit}}' /proc/driver/nvidia/version 2>/dev/null || true)"
+    INSTALLED_NV="$(pacman -Q nvidia-580xx-utils nvidia-utils nvidia-470xx-utils 2>/dev/null | head -n1 | awk '{print $2}' | cut -d'-' -f1 || true)"
+    if [[ -n "$LOADED_NV" && -n "$INSTALLED_NV" && "$LOADED_NV" != "$INSTALLED_NV"* ]]; then
+        GPU_MISMATCH=1
+    fi
+fi
+
+if [[ "$GPU_MISMATCH" -eq 1 ]]; then
+    GPU_UTIL="Reboot Req"
+    GPU_TEMP="Driver Updated"
 else
-    GPU_UTIL="0%"
-    GPU_TEMP="N/A"
+    GPU_RAW="$(nvidia-smi --query-gpu=utilization.gpu,temperature.gpu --format=csv,noheader,nounits 2>/dev/null || true)"
+    if [[ -n "$GPU_RAW" ]]; then
+        GPU_UTIL="$(echo "$GPU_RAW" | awk -F', ' '{print $1}')%"
+        GPU_TEMP="$(echo "$GPU_RAW" | awk -F', ' '{print $2}')°C"
+    else
+        GPU_UTIL="0%"
+        GPU_TEMP="N/A"
+    fi
 fi
 
 # 4. Live Battery stats
@@ -88,8 +104,12 @@ case "$CHOICE" in
         send_notification "Power Mode: Performance" "High Performance mode activated. CPU & GPU tuned for maximum performance." "video-display" "normal"
         ;;
     *"Telemetry"*)
-        PROCS="$(nvidia-smi --query-compute-apps=process_name,used_memory --format=csv,noheader 2>/dev/null || true)"
-        [[ -z "$PROCS" ]] && PROCS="No active 3D compute processes"
+        if [[ "$GPU_MISMATCH" -eq 1 ]]; then
+            PROCS="Driver Updated: RAM module ($LOADED_NV) != Disk package ($INSTALLED_NV). System reboot required (sudo reboot)."
+        else
+            PROCS="$(nvidia-smi --query-compute-apps=process_name,used_memory --format=csv,noheader 2>/dev/null || true)"
+            [[ -z "$PROCS" ]] && PROCS="No active 3D compute processes"
+        fi
         send_notification "Hardware Status" "CPU Usage: ${CPU_UTIL}\nGPU: ${GPU_UTIL} (${GPU_TEMP})\nBattery: ${BAT_CAP}% (${BAT_STAT})\nActive GPU Processes:\n${PROCS}" "video-display" "normal"
         ;;
     *"Hardware Sentinel"*)
