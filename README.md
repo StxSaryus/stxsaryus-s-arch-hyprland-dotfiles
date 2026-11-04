@@ -56,8 +56,10 @@ A clean, dependency-free Hyprland setup built from scratch — no framework bloa
 .
 ├── config/
 │   ├── hypr/
-│   │   ├── hyprland.conf            # Main Hyprland config
-│   │   ├── gpu-env.conf             # Dynamic CPU/GPU environment & cursor config
+│   │   ├── hyprland.lua             # Main Hyprland config (Native Lua - v0.57+)
+│   │   ├── hyprland.conf            # Main Hyprland config (Legacy syntax)
+│   │   ├── gpu-env.lua              # Dynamic CPU/GPU environment & cursor config (Lua)
+│   │   ├── gpu-env.conf             # Dynamic CPU/GPU environment & cursor config (Legacy)
 │   │   ├── hyprpaper.conf           # Wallpaper preload (instant boot wallpaper)
 │   │   ├── hyprlock.conf            # Screen locker (blur background, PAM auth)
 │   │   ├── waybar-autohide.sh       # Win11-style auto show/hide logic
