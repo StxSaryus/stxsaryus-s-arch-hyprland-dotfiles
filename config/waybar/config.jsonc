@@ -9,7 +9,7 @@
     "modules-left": [
         "custom/lock",
         "custom/arch",
-        "hyprland/workspaces",
+        "ext/workspaces",
         "hyprland/window",
         "mpris"
     ],
@@ -36,12 +36,12 @@
         "format": "",
         "tooltip": false,
         "on-click": "~/.local/share/bin/launcher-toggle.sh",
-        "on-click-right": "hyprctl dispatch exec ~/.local/share/bin/waypaper-toggle.sh"
+        "on-click-right": "~/.local/share/bin/waypaper-toggle.sh"
     },
-    "hyprland/workspaces": {
+    "ext/workspaces": {
         "format": "{name}",
         "on-click": "activate",
-        "sort-by-number": true
+        "sort-by-id": true
     },
     "hyprland/window": {
         "format": "{}",
@@ -152,14 +152,14 @@
     "custom/waypaper": {
         "format": "󰸉",
         "tooltip": "Wallpaper picker",
-        "on-click": "hyprctl dispatch exec ~/.local/share/bin/waypaper-toggle.sh",
-        "on-click-right": "hyprctl dispatch exec ~/.local/share/bin/waypaper-toggle.sh"
+        "on-click": "~/.local/share/bin/waypaper-toggle.sh",
+        "on-click-right": "~/.local/share/bin/waypaper-toggle.sh"
     },
     "custom/updates": {
         "exec": "~/.local/share/bin/systemupdate.sh",
         "return-type": "json",
         "format": "{}",
-        "on-click": "hyprctl dispatch exec '~/.local/share/bin/systemupdate.sh up'",
+        "on-click": "~/.local/share/bin/systemupdate.sh up",
         "interval": 86400,
         "tooltip": true,
         "signal": 20

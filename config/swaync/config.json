@@ -72,7 +72,7 @@
               },
               {
                   "label": "󰍃",
-                  "command": "hyprctl dispatch exit"
+                  "command": "sh -c \"hyprctl dispatch 'hl.dsp.exit()' || hyprctl dispatch exit\""
               },
               {
                   "label": "󰝟",

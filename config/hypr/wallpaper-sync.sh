@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Sync Waypaper choice → hyprpaper.conf and apply immediately
+# Sync Waypaper choice → hyprpaper.conf (hyprpaper 0.8.4+ block syntax) and apply immediately
 set -euo pipefail
 
 INI="${XDG_CONFIG_HOME:-$HOME/.config}/waypaper/config.ini"
 CONF="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprpaper.conf"
 
-[[ -f "$INI" ]] || exit 0
-
-WP="$(grep -E '^wallpaper\s*=' "$INI" | head -1 | cut -d'=' -f2- | xargs || true)"
+WP="${1:-}"
+if [[ -z "$WP" && -f "$INI" ]]; then
+    WP="$(grep -E '^wallpaper\s*=' "$INI" | head -1 | cut -d'=' -f2- | xargs || true)"
+fi
 [[ -z "$WP" ]] && exit 0
 
 WP="${WP/#\~/$HOME}"
@@ -19,18 +20,20 @@ if [[ -L "$CONF" ]]; then
 fi
 
 cat > "$CONF" <<EOF
-preload = ${WP}
-wallpaper = ,${WP}
+wallpaper {
+    monitor =
+    path = ${WP}
+    fit_mode = cover
+}
 splash = false
 EOF
 
-# Apply live (Hyprland IPC) then fall back to restart
-if command -v hyprctl >/dev/null && pgrep -x hyprpaper >/dev/null; then
-    hyprctl hyprpaper unload all >/dev/null 2>&1 || true
-    hyprctl hyprpaper preload "$WP" >/dev/null 2>&1 || true
-    hyprctl hyprpaper wallpaper ",$WP" >/dev/null 2>&1 || true
+# Restart hyprpaper so it loads the updated 0.8.4+ config block
+pkill -x hyprpaper 2>/dev/null || true
+sleep 0.15
+if command -v hyprctl >/dev/null 2>&1; then
+    hyprctl dispatch 'hl.dsp.exec_cmd("hyprpaper")' >/dev/null 2>&1 \
+        || (nohup hyprpaper >/dev/null 2>&1 &)
 else
-    pkill -x hyprpaper 2>/dev/null || true
-    sleep 0.2
-    hyprpaper >/dev/null 2>&1 &
+    nohup hyprpaper >/dev/null 2>&1 &
 fi

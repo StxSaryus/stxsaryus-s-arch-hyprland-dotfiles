@@ -47,7 +47,6 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd(config_dir .. "/apply-dark-theme.sh")
     -- Sync waypaper's last choice to hyprpaper.conf so wallpaper persists across reboots
     hl.exec_cmd(config_dir .. "/wallpaper-sync.sh")
-    hl.exec_cmd("waypaper")
     hl.exec_cmd("systemctl --user start xdg-desktop-portal xdg-desktop-portal-hyprland xdg-desktop-portal-gtk")
     hl.exec_cmd("waybar -c " .. home .. "/.config/waybar/config.jsonc -s " .. home .. "/.config/waybar/style.css")
     hl.exec_cmd("bash -c '" .. config_dir .. "/waybar-autohide.sh &'")

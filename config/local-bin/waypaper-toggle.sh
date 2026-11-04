@@ -14,11 +14,11 @@ if pgrep -x waypaper >/dev/null 2>&1; then
     exit 0
 fi
 
-# Launch detached so Waybar does not kill the GTK window
-if command -v hyprctl >/dev/null; then
-    hyprctl dispatch exec "uwsm app -- waypaper" >/dev/null 2>&1 \
-        || hyprctl dispatch exec waypaper >/dev/null 2>&1
+# Launch detached via Hyprland 0.57+ Lua dispatcher (with legacy & direct fallbacks)
+if command -v hyprctl >/dev/null 2>&1; then
+    hyprctl dispatch 'hl.dsp.exec_cmd("waypaper")' >/dev/null 2>&1 \
+        || hyprctl dispatch exec waypaper >/dev/null 2>&1 \
+        || (nohup waypaper >/dev/null 2>&1 &)
 else
-    waypaper >/dev/null 2>&1 &
-    disown || true
+    nohup waypaper >/dev/null 2>&1 &
 fi

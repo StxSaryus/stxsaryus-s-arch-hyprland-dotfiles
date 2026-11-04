@@ -30,11 +30,12 @@ EOF
 done
 
 REPO="${DOTFILES_REPO:-$HOME/dotfiles}"
-[[ -f "$REPO/config/kdeglobals" ]] && cp -f "$REPO/config/kdeglobals" "$XDG_CONFIG_HOME/kdeglobals"
-[[ -f "$REPO/config/xdg-desktop-portal/portals.conf" ]] && \
-    cp -f "$REPO/config/xdg-desktop-portal/portals.conf" "$XDG_CONFIG_HOME/xdg-desktop-portal/portals.conf"
-[[ -f "$REPO/config/environment.d/90-dark-theme.conf" ]] && \
-    cp -f "$REPO/config/environment.d/90-dark-theme.conf" "$XDG_CONFIG_HOME/environment.d/90-dark-theme.conf"
-[[ -f "$REPO/config/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf" ]] && \
+[[ -f "$REPO/config/kdeglobals" && ! "$REPO/config/kdeglobals" -ef "$XDG_CONFIG_HOME/kdeglobals" ]] && \
+    cp -f "$REPO/config/kdeglobals" "$XDG_CONFIG_HOME/kdeglobals" || true
+[[ -f "$REPO/config/xdg-desktop-portal/portals.conf" && ! "$REPO/config/xdg-desktop-portal/portals.conf" -ef "$XDG_CONFIG_HOME/xdg-desktop-portal/portals.conf" ]] && \
+    cp -f "$REPO/config/xdg-desktop-portal/portals.conf" "$XDG_CONFIG_HOME/xdg-desktop-portal/portals.conf" || true
+[[ -f "$REPO/config/environment.d/90-dark-theme.conf" && ! "$REPO/config/environment.d/90-dark-theme.conf" -ef "$XDG_CONFIG_HOME/environment.d/90-dark-theme.conf" ]] && \
+    cp -f "$REPO/config/environment.d/90-dark-theme.conf" "$XDG_CONFIG_HOME/environment.d/90-dark-theme.conf" || true
+[[ -f "$REPO/config/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf" && ! "$REPO/config/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf" -ef "$XDG_CONFIG_HOME/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf" ]] && \
     cp -f "$REPO/config/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf" \
-       "$XDG_CONFIG_HOME/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf"
+       "$XDG_CONFIG_HOME/wireplumber/wireplumber.conf.d/51-disable-hfp-autoswitch.conf" || true
