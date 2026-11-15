@@ -3,7 +3,7 @@ Description=StxSaryus Universal Hardware & Driver Sentinel - Timer (6 hours & at
 Documentation=https://github.com/StxSaryus/stxsaryus-s-arch-hyprland-dotfiles
 
 [Timer]
-OnBootSec=2min
+OnStartupSec=2min
 OnUnitActiveSec=6h
 Persistent=true
 Unit=hardware-sentinel.service
